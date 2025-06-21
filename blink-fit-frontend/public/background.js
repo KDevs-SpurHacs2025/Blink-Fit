@@ -2,22 +2,18 @@ console.log("background.js loaded");
 
 let latestBlinkCount = 0;
 
-// Listener for messages from content scripts (e.g., BLINK_DETECTED)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'BLINK_DETECTED') {
     latestBlinkCount = message.blinkCount;
-    // Send blinkCount to the backend server
     sendBlinkCountToBackend(latestBlinkCount);
   }
 });
 
-// Backend URL definition
-const BACKEND_URL = 'http://localhost:8000'; // Base URL for your backend
+const BACKEND_URL = 'http://127.0.0.1:8000';
 
-// Function to send blink count to the backend
 async function sendBlinkCountToBackend(blinkCount) {
   try {
-    const response = await fetch(`${BACKEND_URL}/blink-count`, { // Adjust endpoint as per your backend API
+    const response = await fetch(`${BACKEND_URL}/blink-count`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ blinkCount }),
@@ -32,19 +28,14 @@ async function sendBlinkCountToBackend(blinkCount) {
   }
 }
 
-// Poll the backend every 10 seconds and send a signal to content scripts if available
 setInterval(async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/signal`); // Adjust endpoint as per your backend API
+    const response = await fetch(`${BACKEND_URL}/api/signal`);
     if (response.ok) {
       const data = await response.json();
       if (data && data.signal) {
-        // Send signal to all active tabs
         chrome.tabs.query({}, (tabs) => {
           tabs.forEach((tab) => {
-            // This message is sent to content scripts that are injected into web pages.
-            // If your webcam demo runs as a popup, it will listen to this message directly
-            // within its own script context.
             chrome.tabs.sendMessage(tab.id, { type: 'BACKEND_SIGNAL', signal: data.signal });
           });
         });
