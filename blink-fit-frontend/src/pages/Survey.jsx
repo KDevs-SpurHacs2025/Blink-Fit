@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
-import PrimaryButton from "../components/PrimaryButton";
+import useUserStore from "../store/userStore";
+import ConfirmModal from "../components/ConfirmModal";
 
 const choiceQuestions = questions.filter((q) => q.type === "choice");
 const inputQuestions = questions.filter((q) => q.type === "input");
@@ -10,8 +11,11 @@ const inputQuestions = questions.filter((q) => q.type === "input");
 export default function Survey() {
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [modalPayload, setModalPayload] = useState(null);
   const progress = step === 1 ? "50%" : "100%";
   const navigate = useNavigate();
+  const setSurveyAnswers = useUserStore((state) => state.setSurveyAnswers);
 
   const allChoicesAnswered = choiceQuestions.every((q) => answers[q.name]);
   const allInputsFilled = inputQuestions.every((q) => {
@@ -29,13 +33,105 @@ export default function Survey() {
     setStep(2);
   };
 
+  function buildApiPayload() {
+    // 객관식(quiz) 변환
+    const quiz = choiceQuestions.map((q, idx) => {
+      const selected = q.options.find((opt) => opt.text === answers[q.name]);
+      return {
+        questionId: idx + 1,
+        answer: answers[q.name],
+        level: selected ? selected.level : 0,
+      };
+    });
+    // 주관식(subjective) 변환
+    const subjective = {};
+    inputQuestions.forEach((q) => {
+      subjective[q.name] = answers[q.name] || "";
+    });
+    // userId 예시 (실제 userStore에서 가져와도 됨)
+    return {
+      userId: "janeDoe@gmail.com",
+      quiz,
+      subjective,
+    };
+  }
+
   const handleSave = () => {
-    alert("Survey saved!" + JSON.stringify(answers, null, 2));
+    const apiPayload = buildApiPayload();
+    setSurveyAnswers(answers);
+    setModalPayload(apiPayload);
+    setShowModal(true);
+  };
+
+  const handleModalConfirm = () => {
+    setShowModal(false);
     navigate("/routine");
   };
 
+  const handleModalCancel = () => {
+    setShowModal(false);
+  };
+
+  const renderModalContent = () => {
+    if (!modalPayload) return null;
+    // Map questionId to question text for quiz
+    const quizMap = {};
+    choiceQuestions.forEach((q, idx) => {
+      quizMap[idx + 1] = q.question;
+    });
+    // Map subjective name to question text
+    const subjectiveMap = {};
+    inputQuestions.forEach((q) => {
+      subjectiveMap[q.name] = q.question;
+    });
+    return (
+      <div className="text-left">
+        <h3 className="font-semibold mb-2 text-sm">Quiz Answers</h3>
+        <ul className="mb-3 list-disc pl-4 text-xs">
+          {modalPayload.quiz.map((item) => (
+            <li
+              key={item.questionId}
+              className="mb-1 flex gap-1 items-start whitespace-normal break-words"
+            >
+              <span className="font-medium whitespace-normal break-words">
+                {quizMap[item.questionId]}:
+              </span>
+              <span className="whitespace-normal break-words text-gray-700">
+                {item.answer}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <h3 className="font-semibold mb-2 text-sm">Your Info</h3>
+        <ul className="list-disc pl-4 text-xs">
+          {Object.entries(modalPayload.subjective).map(([key, value]) => (
+            <li
+              key={key}
+              className="mb-1 flex gap-1 items-start whitespace-normal break-words"
+            >
+              <span className="font-medium whitespace-normal break-words">
+                {subjectiveMap[key]}:
+              </span>
+              <span className="whitespace-normal break-words text-gray-700">
+                {value}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   return (
-    <div className="w-full h-full flex items-center justify-center bg-bg-color overflow-hidden">
+    <div className="w-full h-full flex items-center justify-center bg-gray-100 overflow-hidden">
+      {showModal && (
+        <ConfirmModal
+          title="Confirm Your Answers"
+          message={renderModalContent()}
+          onConfirm={handleModalConfirm}
+          onCancel={handleModalCancel}
+        />
+      )}
       <div className="w-3/4 h-full flex flex-col items-center">
         {/* Progress bar */}
         <div className="w-3/4 h-2 bg-[#D9D9D9] rounded-full mt-10 mb-12">
@@ -72,10 +168,12 @@ export default function Survey() {
                             type="radio"
                             name={q.name}
                             className="form-radio"
-                            checked={answers[q.name] === option}
-                            onChange={() => handleInput(q.name, option)}
+                            checked={answers[q.name] === option.text}
+                            onChange={() =>
+                              handleInput(q.name, option.text, "choice")
+                            }
                           />
-                          <span className="text-sm">{option}</span>
+                          <span className="text-sm">{option.text}</span>
                         </label>
                       ))}
                     </div>

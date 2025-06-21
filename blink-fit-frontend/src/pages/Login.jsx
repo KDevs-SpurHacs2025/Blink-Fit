@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import PrimaryButton from "../components/PrimaryButton";
+import useUserStore from "../store/userStore";
 
 const handleStartEyeTracking = () => {
   const trackerUrl = chrome.runtime.getURL("tracker.html");
@@ -8,6 +8,15 @@ const handleStartEyeTracking = () => {
 
 export default function Login() {
   const navigate = useNavigate();
+  const setUser = useUserStore((state) => state.setUser);
+
+  // Simulate a Google login by setting a user
+  // In a real application, you would handle the OAuth flow here
+  const handleGoogleLogin = () => {
+    setUser({ id: "janeDoe@gmail.com", pwd: "!Jane123" });
+    navigate("/survey");
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-between bg-bg-color text-center pt-40 pb-20">
       <div>
@@ -21,8 +30,8 @@ export default function Login() {
           Continue with Google
         </PrimaryButton>
         <button
-          onClick={() => navigate("/loading")}
-          className="w-full font-normal border border-primary py-3 rounded-lg hover:bg-opacity-90 mb-4 transition"
+          onClick={handleGoogleLogin}
+          className="bg-green-500 w-full text-black py-2 px-4 rounded-lg hover:bg-opacity-90 w-full mb-4 transition"
         >
           Enter as guest
         </button>

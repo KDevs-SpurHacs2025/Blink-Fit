@@ -4,65 +4,74 @@ const questions = [
     name: "wearGlasses",
     question: "Do you wear glasses or contact lenses?",
     options: [
-      "I don't wear any",
-      "Glasses",
-      "Contact Lenses"
-    ]
+      { text: "I don't wear any", level: 0 },
+      { text: "Glasses", level: 0 },
+      { text: "Contact Lenses", level: 0 },
+    ],
   },
   {
     type: "choice",
     name: "eyeConditions",
     question: "Do you have any of the following eye conditions?",
     options: [
-      "Dry eyes",
-      "Astigmatism",
-      "Myopia (Nearsightedness)",
-      "Hyperopia (Farsightedness)",
-      "Glaucoma",
-      "None of the above",
-      "I'm not sure"
-    ]
+      { text: "Dry eyes", level: 0 },
+      { text: "Astigmatism", level: 0 },
+      { text: "Myopia (Nearsightedness)", level: 0 },
+      { text: "Hyperopia (Farsightedness)", level: 0 },
+      { text: "Glaucoma", level: 0 },
+      { text: "None of the above", level: 0 },
+      { text: "I'm not sure", level: 0 },
+    ],
   },
-    {
+  {
     type: "choice",
     name: "eyeStrain",
-    question: "Do your eyes feel tried, dry, or strained while using screens?",
+    question: "Do your eyes feel tired, dry, or strained while using screens?",
     options: [
-      "Very often",
-      "Sometimes",
-      "Rarely",
-      "Never"
-    ]
+      { text: "Very often", level: 0 },
+      { text: "Sometimes", level: 0 },
+      { text: "Rarely", level: 0 },
+      { text: "Never", level: 0 },
+    ],
   },
-    {
+  {
     type: "choice",
     name: "screenHours",
     question: "How many hours do you spend on screens daily?",
     options: [
-      "Less than 2 hours",
-      "2-6 hours",
-      "More than 6 hours"
-    ]
+      { text: "Less than 2 hours", level: 0 },
+      { text: "2-6 hours", level: 0 },
+      { text: "More than 6 hours", level: 0 },
+    ],
   },
-    {
+  {
     type: "choice",
     name: "lightSensitive",
     question: "Are your eyes sensitive to light?",
     options: [
-      "Yes",
-      "No",
-      "Not sure"
-    ]
+      { text: "Yes", level: 0 },
+      { text: "No", level: 0 },
+      { text: "Not sure", level: 0 },
+    ],
   },
-    {
+  {
     type: "choice",
     name: "headaches",
     question: "Do you get headaches or blurry vision after using screens?",
     options: [
-      "Yes",
-      "No",
-      "Sometimes"
-    ]
+      { text: "Yes", level: 0 },
+      { text: "No", level: 0 },
+      { text: "Sometimes", level: 0 },
+    ],
+  },
+  {
+    type: "choice",
+    name: "goOutside",
+    question: "Will you be able to go outside during your breaks today?",
+    options: [
+      { text: "Yes", level: 0 },
+      { text: "No", level: 0 },
+    ],
   },
   {
     type: "input",
@@ -80,7 +89,13 @@ const questions = [
     type: "input",
     question: "What's your break-time vibe?",
     inputType: "text",
-    name: "breakVibe",
+    name: "breakPreference",
+  },
+  {
+    type: "input",
+    question: "Do you have a favorite snack during breaks?",
+    inputType: "text",
+    name: "favoriteSnack",
   },
 ];
 
