@@ -5,6 +5,8 @@ import Survey from "./pages/Survey.jsx";
 import Loading from "./pages/Loading.jsx";
 import Routine from "./pages/Routine.jsx";
 import Policy from "./pages/Policy.jsx";
+import Home from "./pages/Home.jsx";
+import Settings from "./pages/Settings.jsx";
 import Summary from "./pages/Summary.jsx";
 
 //Screen-Break
@@ -27,6 +29,8 @@ function App() {
           <Route path="/loading" element={<Loading />} />
           <Route path="/routine" element={<Routine />} />
           <Route path="/policy" element={<Policy />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/screen-time" element={<ScreenTime />} />
           <Route path="/summary" element={<Summary />} />
           {/* Add more routes as needed */}

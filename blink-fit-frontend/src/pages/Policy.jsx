@@ -29,7 +29,7 @@ export default function Policy() {
               subText:
                 "We’ve personalized your journey based on your answers. Let’s turn your answers into better screen habits",
               buttonText: "Start",
-              next: "/",
+              next: "/home",
             },
           })
         }
