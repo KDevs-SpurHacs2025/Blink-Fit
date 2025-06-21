@@ -8,17 +8,26 @@ import Summary from "./pages/Summary.jsx";
 import ScreenTime from "./pages/ScreenTime.jsx";
 function App() {
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/survey" element={<Survey />} />
-        {/* Screen-Break */}
-        <Route path="/screen-time" element={<ScreenTime />} />
-        <Route path="/summary" element={<Summary />} />
-        {/* Add more routes as needed */}
-      </Routes>
-    </HashRouter>
+    <div
+      style={{
+        width: "600px",
+        height: "800px",
+        margin: "0 auto",
+        overflow: "hidden",
+      }}
+    >
+      <HashRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/survey" element={<Survey />} />
+          {/* Screen-Break */}
+          <Route path="/screen-time" element={<ScreenTime />} />
+          <Route path="/summary" element={<Summary />} />
+          {/* Add more routes as needed */}
+        </Routes>
+      </HashRouter>
+    </div>
   );
 }
 

@@ -9,26 +9,23 @@ const handleStartEyeTracking = () => {
 export default function Login() {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md text-center">
-        {/* ICON*/}
-        <div className="mb-4"></div>
-
-        <h1 className="text-4xl text-black font-extrabold mb-2 tracking-wide">
-          <span className="italic">BLINK</span>{" "}
-          <span className="font-bold">FIT</span>
+    <div className="w-full h-full flex flex-col items-center justify-between bg-gray-100 text-center py-40">
+      <div>
+        <h1 className="text-6xl text-black font-extrabold mb-1">
+          <span className="italic">BLINK FIT</span>
         </h1>
-        <p className="text-gray-500 mb-8 text-sm">
+        <p className="text-gray-500 text-lg text-md">
           Digital life meets mindful habits
         </p>
-
+      </div>
+      <div className="w-3/4">
         <button
-          onClick={() => navigate("/survey")}
-          className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 w-full mb-4 transition"
+          onClick={() => navigate("/loading")}
+          className="bg-green-500 w-full text-black py-2 px-4 rounded-md hover:bg-opacity-90 w-full mb-4 transition"
         >
           Continue with Google
         </button>
-        <button className="border border-green-500 text-green-700 py-2 px-4 rounded-md hover:bg-green-50 w-full transition">
+        <button className="border border-green-500 w-full text-primary py-2 px-4 rounded-md hover:transition">
           Enter as guest
         </button>
         <button
