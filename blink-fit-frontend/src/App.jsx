@@ -2,6 +2,9 @@ import React from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Survey from "./pages/Survey.jsx";
+import Loading from "./pages/Loading.jsx";
+import Routine from "./pages/Routine.jsx";
+import Policy from "./pages/Policy.jsx";
 import Summary from "./pages/Summary.jsx";
 
 //Screen-Break
@@ -21,7 +24,9 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/survey" element={<Survey />} />
-          {/* Screen-Break */}
+          <Route path="/loading" element={<Loading />} />
+          <Route path="/routine" element={<Routine />} />
+          <Route path="/policy" element={<Policy />} />
           <Route path="/screen-time" element={<ScreenTime />} />
           <Route path="/summary" element={<Summary />} />
           {/* Add more routes as needed */}
