@@ -1,0 +1,35 @@
+{
+  "name": "eye-shield-backend",
+  "version": "1.0.0",
+  "description": "Backend for Eye-Shield Chrome Extension to monitor eye health and provide personalized recommendations.",
+  "main": "src/server.js",
+  "scripts": {
+    "clean": "rm -rf dist && find src -name \"*.js\" -delete",
+    "build": "npx tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon dist/server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.10.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.6.0",
+    "csv-stringify": "^6.5.2",
+    "dotenv": "^8.6.0",
+    "express": "^4.21.2",
+    "mongoose": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^24.0.3",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "author": "Your Name",
+  "license": "MIT"
+}
