@@ -2,15 +2,36 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
+import useUserStore from "../store/userStore";
 
 const choiceQuestions = questions.filter((q) => q.type === "choice");
 const inputQuestions = questions.filter((q) => q.type === "input");
+
+function buildApiPayload(user, answers) {
+  // 객관식(quiz) 변환
+  const quiz = choiceQuestions.map((q, idx) => ({
+    questionId: q.id || idx + 1,
+    answer: answers[q.name]?.text || "",
+    level: answers[q.name]?.level ?? 0,
+  }));
+  // 주관식(subjective) 변환
+  const subjective = {};
+  inputQuestions.forEach((q) => {
+    subjective[q.name] = answers[q.name] || "";
+  });
+  return {
+    userId: user?.email || "",
+    quiz,
+    subjective,
+  };
+}
 
 export default function Survey() {
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState({});
   const progress = step === 1 ? "50%" : "100%";
   const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
 
   const allChoicesAnswered = choiceQuestions.every((q) => answers[q.name]);
   const allInputsFilled = inputQuestions.every((q) => {
@@ -29,7 +50,10 @@ export default function Survey() {
   };
 
   const handleSave = () => {
+    const payload = buildApiPayload(user, answers);
+    console.log("API 전송용 payload:", payload);
     alert("Survey saved!" + JSON.stringify(answers, null, 2));
+    // TODO: fetch/axios로 payload를 백엔드로 전송
     navigate("/routine");
   };
 
@@ -71,12 +95,12 @@ export default function Survey() {
                             type="radio"
                             name={q.name}
                             className="form-radio"
-                            checked={answers[q.name] === option}
+                            checked={answers[q.name]?.text === option.text}
                             onChange={() =>
                               handleInput(q.name, option, "choice")
                             }
                           />
-                          <span className="text-sm">{option}</span>
+                          <span className="text-sm">{option.text}</span>
                         </label>
                       ))}
                     </div>
