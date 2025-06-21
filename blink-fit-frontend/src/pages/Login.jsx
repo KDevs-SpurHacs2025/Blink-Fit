@@ -22,7 +22,10 @@ export default function Login() {
         <PrimaryButton onClick={() => navigate("/loading")}>
           Continue with Google
         </PrimaryButton>
-        <button className="w-full border border-primary py-3 rounded-lg hover:bg-opacity-90 mb-4 transition">
+        <button
+          onClick={() => navigate("/loading")}
+          className="w-full border border-primary py-3 rounded-lg hover:bg-opacity-90 mb-4 transition"
+        >
           Enter as guest
         </button>
         {/* <button
