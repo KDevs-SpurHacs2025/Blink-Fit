@@ -34,6 +34,7 @@ export default function Login() {
           type="button"
         >
           Start Eye Tracking (New Page)
+        </button>
         <button onClick={() => navigate("/screen-time")}>
           Check Screen Time
         </button>
