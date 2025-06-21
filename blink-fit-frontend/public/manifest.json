@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Blink-Fit",
   "version": "1.0",
   "description": "Tracks blink count and suggests tailored screen breaks to build healthy habits.",
@@ -8,19 +8,41 @@
     "default_icon": "icon.png"
   },
   "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:8000/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.bundle.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "tracker.html",
+        "tracker.js",
+        "task-vision/vision_bundle.mjs",
+        "task-vision/*.task",
+        "task-vision/wasm/*.wasm",
+        "task-vision/wasm/*.js",
+        "assets/*"
+      ],
+      "matches": ["<all_urls>"]
     }
   ],
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self' 'wasm-unsafe-eval'; worker-src 'self';",
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals allow-pointer-lock allow-orientation-lock allow-downloads allow-pointer-lock allow-presentation; script-src 'self' 'wasm-unsafe-eval'; object-src 'self' 'wasm-unsafe-eval';"
   }
 }
