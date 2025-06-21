@@ -1,6 +1,4 @@
-import { useNavigate } from "react-router-dom";
 export default function Survey() {
-  const navigate = useNavigate();
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-xl text-center">
@@ -48,12 +46,6 @@ export default function Survey() {
             ))}
         </div>
 
-        <button
-          onClick={() => navigate("/login")}
-          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition"
-        >
-          Next
-        </button>
         {/* 하단 버튼 */}
         <button className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition">
           Next

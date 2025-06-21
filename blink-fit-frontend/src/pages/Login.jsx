@@ -25,6 +25,9 @@ export default function Login() {
         <button className="border border-green-500 text-green-700 py-2 px-4 rounded-md hover:bg-green-50 w-full transition">
           Enter as guest
         </button>
+        <button onClick={() => navigate("/screen-time")}>
+          Check Screen Time
+        </button>
       </div>
     </div>
   );
