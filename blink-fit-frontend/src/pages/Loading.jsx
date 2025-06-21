@@ -10,7 +10,7 @@ export default function Loading() {
   // Get props from location.state or use defaults
   const {
     title = null,
-    buttonText = "Continue",
+    buttonText = "Continue >",
     next = "/survey",
     subText = "Let’s understand your screen habits and eye health to personalize your experience",
   } = location.state || {};
