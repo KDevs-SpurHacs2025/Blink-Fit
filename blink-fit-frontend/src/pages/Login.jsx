@@ -1,13 +1,22 @@
 import { useNavigate } from "react-router-dom";
+import useUserStore from "../store/userStore";
 
 const handleStartEyeTracking = () => {
-    const trackerUrl = chrome.runtime.getURL("tracker.html");
-    window.open(trackerUrl, "_blank", "width=800,height=600");
-  };
-
+  const trackerUrl = chrome.runtime.getURL("tracker.html");
+  window.open(trackerUrl, "_blank", "width=800,height=600");
+};
 
 export default function Login() {
   const navigate = useNavigate();
+  const setUser = useUserStore((state) => state.setUser);
+
+  // Simulate a Google login by setting a user
+  // In a real application, you would handle the OAuth flow here
+  const handleGoogleLogin = () => {
+    setUser({ id: "janeDoe@gmail.com", pwd: "!Jane123" });
+    navigate("/survey");
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-between bg-gray-100 text-center py-40">
       <div>
@@ -20,7 +29,7 @@ export default function Login() {
       </div>
       <div className="w-3/4">
         <button
-          onClick={() => navigate("/loading")}
+          onClick={handleGoogleLogin}
           className="bg-green-500 w-full text-black py-2 px-4 rounded-lg hover:bg-opacity-90 w-full mb-4 transition"
         >
           Continue with Google
