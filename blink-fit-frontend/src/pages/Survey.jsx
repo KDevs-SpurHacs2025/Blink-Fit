@@ -60,6 +60,7 @@ export default function Survey() {
 
   const handleSave = () => {
     const apiPayload = buildApiPayload();
+    console.log("[Survey] 실제 서버 전송 payload:", apiPayload);
     setSurveyAnswers(answers);
     setModalPayload(apiPayload);
     setShowModal(true);
@@ -126,14 +127,14 @@ export default function Survey() {
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-color overflow-hidden">
-        {showModal && (
-            <ConfirmModal
-              title="Confirm Your Answers"
-              message={renderModalContent()}
-              onConfirm={handleModalConfirm}
-              onCancel={handleModalCancel}
-            />
-          )}
+      {showModal && (
+        <ConfirmModal
+          title="Confirm Your Answers"
+          message={renderModalContent()}
+          onConfirm={handleModalConfirm}
+          onCancel={handleModalCancel}
+        />
+      )}
       <div className="w-3/4 h-full flex flex-col items-center">
         {/* Progress bar */}
         <div className="w-3/4 h-2 bg-[#D9D9D9] rounded-full mt-10 mb-12">
@@ -159,20 +160,22 @@ export default function Survey() {
                 </h2>
                 {choiceQuestions.map((q) => (
                   <div key={q.name} className="w-full mb-10">
-                    <p className="text-medium mb-2">{q.question}</p>
+                    <div className="text-medium mb-2">{q.question}</div>
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label
                           key={idx}
                           className="flex items-center gap-2 bg-white border rounded-lg shadow-sm p-4 cursor-pointer"
                         >
-                        <input
-                          type="radio"
-                          name={q.name}
-                          className="form-radio"
-                          checked={answers[q.name] === option.text}
-                          onChange={() => handleInput(q.name, option.text, "choice")}
-                        />
+                          <input
+                            type="radio"
+                            name={q.name}
+                            className="form-radio"
+                            checked={answers[q.name] === option.text}
+                            onChange={() =>
+                              handleInput(q.name, option.text, "choice")
+                            }
+                          />
                           <span className="text-sm">{option.text}</span>
                         </label>
                       ))}
