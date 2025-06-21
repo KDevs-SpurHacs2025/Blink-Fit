@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Blink-Fit",
   "version": "1.0",
   "description": "Tracks blink count and suggests tailored screen breaks to build healthy habits.",
