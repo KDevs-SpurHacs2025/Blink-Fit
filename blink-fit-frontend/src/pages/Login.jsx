@@ -1,5 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
+const handleStartEyeTracking = () => {
+    const trackerUrl = chrome.runtime.getURL("tracker.html");
+    window.open(trackerUrl, "_blank", "width=800,height=600");
+  };
+
+
 export default function Login() {
   const navigate = useNavigate();
   return (
@@ -21,6 +27,15 @@ export default function Login() {
         </button>
         <button className="border border-green-500 w-full text-primary py-2 px-4 rounded-md hover:transition">
           Enter as guest
+        </button>
+        <button
+          onClick={handleStartEyeTracking}
+          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full mt-4 transition"
+          type="button"
+        >
+          Start Eye Tracking (New Page)
+        <button onClick={() => navigate("/screen-time")}>
+          Check Screen Time
         </button>
       </div>
     </div>
