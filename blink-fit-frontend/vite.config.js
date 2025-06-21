@@ -1,7 +1,24 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html', // Main entry for React app popup
+        content: './public/content.js', 
+      },
+      output: {
+        // This ensures 'content.js' is output as 'content.bundle.js' directly in 'dist' folder
+        entryFileNames: assetInfo => {
+          if (assetInfo.name === 'content') {
+            return 'content.bundle.js';
+          }
+          return 'assets/[name]-[hash].js';
+        },
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+      },
+    },
+  },
 });
