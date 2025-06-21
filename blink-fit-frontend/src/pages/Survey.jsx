@@ -58,6 +58,7 @@ export default function Survey() {
 
   const handleSave = () => {
     const apiPayload = buildApiPayload();
+    console.log("[Survey] 실제 서버 전송 payload:", apiPayload);
     setSurveyAnswers(answers);
     setModalPayload(apiPayload);
     setShowModal(true);
@@ -123,7 +124,7 @@ export default function Survey() {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-100 overflow-hidden">
+    <div className="w-full h-full flex items-center justify-center bg-color overflow-hidden">
       {showModal && (
         <ConfirmModal
           title="Confirm Your Answers"
@@ -157,7 +158,8 @@ export default function Survey() {
                 </h2>
                 {choiceQuestions.map((q) => (
                   <div key={q.name} className="w-full mb-10">
-                    <p className="text-base font-medium mb-3">{q.question}</p>
+                    <div className="text-medium mb-2">{q.question}</div>
+
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label
