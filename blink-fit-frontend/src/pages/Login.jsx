@@ -25,6 +25,13 @@ export default function Login() {
         <button className="border border-green-500 text-green-700 py-2 px-4 rounded-md hover:bg-green-50 w-full transition">
           Enter as guest
         </button>
+        <button
+          onClick={handleStartEyeTracking}
+          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full mt-4 transition"
+          type="button"
+        >
+          Start Eye Tracking (New Page)
+        </button>
       </div>
     </div>
   );
