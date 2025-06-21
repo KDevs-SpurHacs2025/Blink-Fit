@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../store/userStore";
+import PrimaryButton from "../components/PrimaryButton";
 
 const handleStartEyeTracking = () => {
   const trackerUrl = chrome.runtime.getURL("tracker.html");
@@ -18,26 +19,26 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-between bg-gray-100 text-center py-40">
+    <div className="w-full h-full flex flex-col items-center justify-between bg-color text-center pt-40 pb-20">
       <div>
-        <h1 className="text-6xl text-black font-extrabold mb-1">
-          <span className="italic">BLINK FIT</span>
+        <h1 className="text-6xl text-black font-extrabold italic mb-1">
+          BLINK FIT
         </h1>
-        <p className="text-gray-500 text-lg">
+        <p className="text-lg text-dark-gray font-normal">
           Digital life meets mindful habits
         </p>
       </div>
       <div className="w-3/4">
-        <button
-          onClick={handleGoogleLogin}
-          className="bg-green-500 w-full text-black py-2 px-4 rounded-lg hover:bg-opacity-90 w-full mb-4 transition"
-        >
+        <PrimaryButton onClick={() => navigate("/loading")}>
           Continue with Google
-        </button>
-        <button className="border border-green-500 w-full py-2 px-4 rounded-lg hover:transition">
-          Enter as guest
-        </button>
-        <button
+        </PrimaryButton>
+<button
+  onClick={handleGoogleLogin}
+  className="bg-green-500 w-full text-black py-2 px-4 rounded-lg hover:bg-opacity-90 w-full mb-4 transition"
+>
+  Enter as guest
+</button>
+        {/* <button
           onClick={handleStartEyeTracking}
           className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full mt-4 transition"
           type="button"
@@ -46,7 +47,7 @@ export default function Login() {
         </button>
         <button onClick={() => navigate("/screen-time")}>
           Check Screen Time
-        </button>
+        </button> */}
       </div>
     </div>
   );
