@@ -1,5 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
+const handleStartEyeTracking = () => {
+    const trackerUrl = chrome.runtime.getURL("tracker.html");
+    window.open(trackerUrl, "_blank", "width=800,height=600");
+  };
+
+
 export default function Login() {
   const navigate = useNavigate();
   return (
