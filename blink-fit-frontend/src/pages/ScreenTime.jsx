@@ -12,7 +12,7 @@ import { FlagIcon } from "@heroicons/react/24/outline";
 
 export default function ScreenTime() {
   const [status, setStatus] = useState("Danger");
-  const [blinkCount, setBlinkCount] = useState(5);
+  const [blinkCount, setBlinkCount] = useState(0);
   const [totalScreenTime, setTotalScreenTime] = useState(2);
   const [distance, setDistance] = useState(130);
   const [statusColor, setStatusColor] = useState("bg-orange-600");
@@ -148,6 +148,19 @@ export default function ScreenTime() {
 
   // 디버깅: secondsLeft, startMinutes, selectedRoutine 확인
   // console.log("[ScreenTime] secondsLeft:", secondsLeft, "startMinutes:", startMinutes, "selectedRoutine:", selectedRoutine);
+
+  // 실시간 blinkCount 업데이트: background/content script에서 메시지 수신
+  useEffect(() => {
+    function handleBlinkMessage(message) {
+      if (message.type === "BLINK_COUNT_UPDATE" && typeof message.blinkCount === "number") {
+        setBlinkCount(message.blinkCount);
+      }
+    }
+    if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener(handleBlinkMessage);
+      return () => chrome.runtime.onMessage.removeListener(handleBlinkMessage);
+    }
+  }, []);
 
   return (
     <>

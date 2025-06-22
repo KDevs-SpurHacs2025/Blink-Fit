@@ -116,6 +116,11 @@ function onResults(results) {
           blinkCount: blinkCount,
           userId: userId, // Pass logged-in user's ObjectId
         });
+        // React(ScreenTime.jsx)로도 실시간 blinkCount 전달
+        chrome.runtime.sendMessage({
+          type: "BLINK_COUNT_UPDATE",
+          blinkCount: blinkCount,
+        });
       }
     }
     prevEyeClosed = currentEyeClosed;
@@ -159,3 +164,13 @@ window.addEventListener("beforeunload", () => {
     cancelAnimationFrame(animationFrameId);
   }
 });
+
+// background.js에서 blinkCount 초기화 신호 수신
+if (window.chrome && chrome.runtime) {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "RESET_BLINK_COUNT") {
+      blinkCount = 0;
+      blinkCountDisplay.textContent = `Blinks: 0`;
+    }
+  });
+}

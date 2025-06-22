@@ -25,6 +25,7 @@ const handleStartEyeTracking = () => {
 const Home = () => {
   const navigate = useNavigate();
   const userId = useUserStore((state) => state.user.id);
+  const user = useUserStore((state) => state.user); // user 전체 객체 추가
   const breakTimeCount = useUserStore((state) => state.breakTimeCount);
   const breakCompletionCount = useUserStore(
     (state) => state.breakCompletionCount
@@ -32,6 +33,14 @@ const Home = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // user 정보 chrome.storage.local에 동기화
+  React.useEffect(() => {
+    if (user && user.id && window.chrome && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ user });
+      console.log("user info synced to chrome.storage.local (Home):", user);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!userId) return;
