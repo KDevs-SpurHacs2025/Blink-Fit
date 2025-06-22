@@ -3,7 +3,10 @@ import { create } from "zustand";
 const useUserStore = create((set) => ({
   user: {
     id: "",
+    email: "",
     pwd: "",
+    username: "",
+    survey: false,
   },
   surveyAnswers: {},
   selectedRoutine: null,
@@ -14,10 +17,18 @@ const useUserStore = create((set) => ({
   totalScreenTime: 0, // 초 단위 누적 스크린타임
   totalBreakTime: 0, // 초 단위 누적 브레이크타임
   oneMoreHourUsed: false, // 한 번만 1시간 연장 허용
-  routineGuide: null, // 추가: 서버에서 받은 루틴 가이드 값 저장
-  setUser: (user) => set({ user }),
-  setSurveyAnswers: (answers) => set({ surveyAnswers: answers }),
-  setSelectedRoutine: (routine) => set({ selectedRoutine: routine }),
+  setUser: (user) => {
+    localStorage.setItem("user", JSON.stringify(user));
+    set({ user: { ...user } });
+  },
+  setSurveyAnswers: (answers) => {
+    localStorage.setItem("surveyAnswers", JSON.stringify(answers));
+    set({ surveyAnswers: answers });
+  },
+  setSelectedRoutine: (routine) => {
+    localStorage.setItem("selectedRoutine", JSON.stringify(routine));
+    set({ selectedRoutine: routine });
+  },
   setScreenTimeGoal: (goal) => set({ screenTimeGoal: goal }), // 추가: screenTimeGoal setter
   setRoutineGuide: (guide) => set({ routineGuide: guide }), // 추가: 루틴 가이드 setter
   incrementScreenTime: () =>
@@ -31,9 +42,12 @@ const useUserStore = create((set) => ({
   addBreakTime: (seconds) =>
     set((state) => ({ totalBreakTime: state.totalBreakTime + seconds })),
   setOneMoreHourUsed: (used) => set({ oneMoreHourUsed: used }),
-  resetUser: () =>
+  resetUser: () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("surveyAnswers");
+    localStorage.removeItem("selectedRoutine");
     set({
-      user: { id: "", pwd: "" },
+      user: { id: "", email: "", pwd: "", username: "", survey: false },
       surveyAnswers: {},
       selectedRoutine: null,
       screenTimeGoal: 0,
@@ -43,8 +57,8 @@ const useUserStore = create((set) => ({
       totalScreenTime: 0,
       totalBreakTime: 0,
       oneMoreHourUsed: false,
-      routineGuide: null,
-    }),
+    });
+  },
   resetTimes: () =>
     set({
       totalScreenTime: 0,
@@ -54,7 +68,9 @@ const useUserStore = create((set) => ({
       breakCompletionCount: 0,
       oneMoreHourUsed: false,
     }),
-  resetSurveyAndRoutine: () =>
+  resetSurveyAndRoutine: () => {
+    localStorage.removeItem("surveyAnswers");
+    localStorage.removeItem("selectedRoutine");
     set((state) => ({
       surveyAnswers: {},
       selectedRoutine: null,
@@ -68,7 +84,8 @@ const useUserStore = create((set) => ({
       routineGuide: null,
       // user 정보(state.user)는 그대로 유지
       user: state.user,
-    })),
+    }));
+  },
 }));
 
 export default useUserStore;

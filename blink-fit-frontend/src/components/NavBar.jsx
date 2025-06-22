@@ -11,7 +11,7 @@ const NavBar = () => {
   const isHome = location.pathname === "/home";
   const isSettings = location.pathname === "/settings";
   return (
-    <nav className="fixed bottom-16 left-1/2 -translate-x-1/2 w-[45vw] bg-[#FCFCFC] rounded-full flex items-center justify-between px-12 py-4 shadow-md z-50">
+    <nav className="w-[42vw] max-w-md bg-[#FCFCFC] rounded-full flex items-center justify-between px-12 py-4 shadow-md z-50">
       <button
         className="flex flex-col items-center focus:outline-none"
         onClick={() => navigate("/home")}

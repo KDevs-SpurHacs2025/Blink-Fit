@@ -1,19 +1,7 @@
 import React from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login.jsx";
-import Survey from "./pages/Survey.jsx";
-import Loading from "./pages/Loading.jsx";
-import Routine from "./pages/Routine.jsx";
-import Policy from "./pages/Policy.jsx";
-import Home from "./pages/Home.jsx";
-import Settings from "./pages/Settings.jsx";
-import EyeHealthInfo from "./pages/EyeHealthInfo.jsx";
-import Summary from "./pages/Summary.jsx";
-import BreakTime from "./pages/BreakTime.jsx";
-//Screen-Break
-import ScreenTime from "./pages/ScreenTime.jsx";
-import BreakOver from "./pages/BreakOver.jsx";
-import Limit from "./pages/Limit.jsx";
+import { HashRouter } from "react-router-dom";
+import AppRoutes from "./AppRoutes";
+
 function App() {
   return (
     <div
@@ -25,23 +13,7 @@ function App() {
       }}
     >
       <HashRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/survey" element={<Survey />} />
-          <Route path="/loading" element={<Loading />} />
-          <Route path="/routine" element={<Routine />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/screen-time" element={<ScreenTime />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/eye-health-info" element={<EyeHealthInfo />} />
-          <Route path="/summary" element={<Summary />} />
-          <Route path="/break-time" element={<BreakTime />} />
-          <Route path="/break-over" element={<BreakOver />} />
-          <Route path="/limit" element={<Limit />} />
-          {/* Add more routes as needed */}
-        </Routes>
+        <AppRoutes />
       </HashRouter>
     </div>
   );

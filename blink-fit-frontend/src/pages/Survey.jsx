@@ -17,8 +17,7 @@ export default function Survey() {
   const progress = step === 1 ? "50%" : "100%";
   const navigate = useNavigate();
   const setSurveyAnswers = useUserStore((state) => state.setSurveyAnswers);
-  // userStore에서 userId를 가져옵니다. (userStore 구조에 따라 user.id 또는 user.userId 등으로 접근)
-  const userIdFromStore = useUserStore((state) => state.user?.id); // 예시: user 객체가 있을 때만 id 접근
+  const userId = useUserStore((state) => state.user.id);
 
   const allChoicesAnswered = choiceQuestions.every((q) => answers[q.name]);
   const allInputsFilled = inputQuestions.every((q) => {
@@ -51,7 +50,7 @@ export default function Survey() {
     });
 
     return {
-      userId: userIdFromStore || "fallbackUserId", // 실제 userId를 사용하거나, 없을 경우 대비 (로그인 필수 가정)
+      userId: userId,
       quiz,
       subjective,
     };
