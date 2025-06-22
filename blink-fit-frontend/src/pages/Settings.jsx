@@ -17,7 +17,7 @@ const Settings = () => {
         <span className="text-4xl">👤</span>
       </div>
       {/* Email */}
-      <div className="text-base font-normal">{user?.id || "No email"}</div>
+      <div className="text-base font-normal">{user?.email || "No email"}</div>
       {/* Divider */}
       <div className="w-3/4 border-b border-gray-300 m-14"></div>
       {/* Options */}
@@ -43,8 +43,7 @@ const Settings = () => {
         </div>
       </div>
       {/* Sign Out Button */}
-      <div className="flex-1" />
-      <button className="bg-transparent text-red-500 text-sm font-base hover:underline">
+      <button className="bg-transparent text-red-500 text-sm font-base hover:underline mt-8 mb-16">
         Sign Out
       </button>
       <NavBar />
