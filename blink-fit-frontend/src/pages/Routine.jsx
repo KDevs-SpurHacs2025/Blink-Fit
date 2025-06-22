@@ -8,9 +8,10 @@ export default function Routine() {
   const navigate = useNavigate();
   const [selected, setSelected] = React.useState("micro");
   // Micro Routine: 서버에서 받은 값이라고 가정
+  const routineGuide = useUserStore((state) => state.routineGuide);
   const [microRoutine] = useState({
-    screen: 1, // 예시: 60분
-    break: 1, // 예시: 5분
+    screen: routineGuide?.workDuration || 1, // 서버에서 받은 workDuration 사용
+    break: routineGuide?.breakDuration || 1, // 서버에서 받은 breakDuration 사용
   });
   // Regular Routine: focusSessionLength 기반 계산
   const surveyAnswers = useUserStore((state) => state.surveyAnswers);

@@ -30,6 +30,7 @@ const useUserStore = create((set) => ({
     set({ selectedRoutine: routine });
   },
   setScreenTimeGoal: (goal) => set({ screenTimeGoal: goal }), // 추가: screenTimeGoal setter
+  setRoutineGuide: (guide) => set({ routineGuide: guide }), // 추가: 루틴 가이드 setter
   incrementScreenTime: () =>
     set((state) => ({ screenTimeCount: state.screenTimeCount + 1 })),
   incrementBreakTime: () =>
@@ -80,6 +81,7 @@ const useUserStore = create((set) => ({
       totalScreenTime: 0,
       totalBreakTime: 0,
       oneMoreHourUsed: false,
+      routineGuide: null,
       // user 정보(state.user)는 그대로 유지
       user: state.user,
     }));
