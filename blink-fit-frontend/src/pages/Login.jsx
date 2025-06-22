@@ -12,17 +12,18 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const data = await loginUser(email, password);
+      const responseData = await loginUser(email, password);
       setUser({
-        id: data.userId,
-        username: data.username,
-        survey: data.isSurvey,
+        id: responseData.data.userId,
+        username: responseData.data.username,
+        survey: responseData.data.isSurvey,
       });
 
-      if (data.isSurvey) {
-        navigate("/survey");
-      } else {
+      // Redirect based on survey status
+      if (responseData.data.isSurvey) {
         navigate("/home");
+      } else {
+        navigate("/survey");
       }
     } catch (error) {
       console.error("Login failed", error);
