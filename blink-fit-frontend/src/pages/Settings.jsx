@@ -43,8 +43,7 @@ const Settings = () => {
         </div>
       </div>
       {/* Sign Out Button */}
-      <div className="flex-1" />
-      <button className="bg-transparent text-red-500 text-sm font-base hover:underline">
+      <button className="bg-transparent text-red-500 text-sm font-base hover:underline mt-8 mb-16">
         Sign Out
       </button>
       <NavBar />
