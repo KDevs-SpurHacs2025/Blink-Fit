@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import * as logger from "firebase-functions/logger";
 import GeminiService from "../services/geminiService";
 import { createApiResponse } from "../utils/helpers";
 import { HelloRequest } from "../types";
@@ -18,7 +17,7 @@ export const healthCheck = (req: Request, res: Response) => {
  */
 export const getHello = async (req: Request, res: Response) => {
   try {
-    logger.info("Hello API called", { structuredData: true });
+    console.info("Hello API called", { structuredData: true });
     
     const { name } = req.query;
     const userName = (name as string) || "anonymous user";
@@ -34,7 +33,7 @@ export const getHello = async (req: Request, res: Response) => {
           "Gemini AI"
         ));
       } catch (error) {
-        logger.error("Gemini API error:", error);
+        console.error("Gemini API error:", error);
         // Fallback to default message
         const fallbackMessage = name ? 
           `Hello, ${name}! Welcome to Eye-Shield. Let's protect your eye health together!` : 
@@ -65,7 +64,7 @@ export const getHello = async (req: Request, res: Response) => {
     }
     
   } catch (error) {
-    logger.error("Hello API error:", error);
+    console.error("Hello API error:", error);
     res.status(500).json(createApiResponse(
       false,
       "Internal server error",
@@ -81,7 +80,7 @@ export const getHello = async (req: Request, res: Response) => {
  */
 export const postHello = async (req: Request, res: Response) => {
   try {
-    logger.info("Hello POST API called", { structuredData: true });
+    console.info("Hello POST API called", { structuredData: true });
     
     const { name, message: userMessage }: HelloRequest = req.body;
     const userName = name || "anonymous user";
@@ -104,7 +103,7 @@ export const postHello = async (req: Request, res: Response) => {
           "Gemini AI"
         ));
       } catch (error) {
-        logger.error("Gemini API error:", error);
+        console.error("Gemini API error:", error);
         // Fallback response
         const fallbackMessage = `Hello, ${userName}! Message: ${userMessage || "none"} - Eye-Shield will protect your eye health!`;
         
@@ -139,7 +138,7 @@ export const postHello = async (req: Request, res: Response) => {
     }
     
   } catch (error) {
-    logger.error("Hello POST API error:", error);
+    console.error("Hello POST API error:", error);
     res.status(500).json(createApiResponse(
       false,
       "Internal server error",

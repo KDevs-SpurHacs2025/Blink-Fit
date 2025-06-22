@@ -162,7 +162,6 @@ export default function Survey() {
                     <div className="text-medium font-medium mb-2">
                       {q.question}
                     </div>
-
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label

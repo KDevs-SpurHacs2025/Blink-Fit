@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getHello, postHello, healthCheck } from "../controllers/helloController";
 import { generateGuide } from "../controllers/guideController";
 import { generateExerciseGuide } from "../controllers/exerciseController";
+import { upsertBlinkData } from "../controllers/blinkController";
 
 const router = Router();
 
@@ -9,14 +10,17 @@ const router = Router();
 router.get("/", healthCheck);
 
 // Hello API endpoints
-router.get("/api/hello", getHello);
-router.post("/api/hello", postHello);
+router.get("/hello", getHello);
+router.post("/hello", postHello);
 
 // Guide generation
-router.post("/api/generate-guide", generateGuide);
+router.post("/generate-guide", generateGuide);
 
 // Exercise guidance
-router.post("/api/exercise-guidance", generateExerciseGuide);
+router.post("/exercise-guidance", generateExerciseGuide);
+
+// Recevive user blinking data
+router.post("/api/blink-count", upsertBlinkData);
 
 // 404 handler
 router.use("*", (req, res) => {
