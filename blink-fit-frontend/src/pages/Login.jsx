@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../store/userStore";
+import PrimaryButton from "../components/PrimaryButton";
 
 const handleStartEyeTracking = () => {
   const trackerUrl = chrome.runtime.getURL("tracker.html");

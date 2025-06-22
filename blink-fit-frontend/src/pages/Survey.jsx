@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
 import useUserStore from "../store/userStore";
 import ConfirmModal from "../components/ConfirmModal";
+import PrimaryButton from "../components/PrimaryButton";
 
 const choiceQuestions = questions.filter((q) => q.type === "choice");
 const inputQuestions = questions.filter((q) => q.type === "input");
@@ -158,7 +159,9 @@ export default function Survey() {
                 </h2>
                 {choiceQuestions.map((q) => (
                   <div key={q.name} className="w-full mb-10">
-                    <div className="text-medium mb-2">{q.question}</div>
+                    <div className="text-medium font-medium mb-2">
+                      {q.question}
+                    </div>
 
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
