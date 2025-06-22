@@ -9,8 +9,13 @@ export default function Login() {
   const setUser = useUserStore((state) => state.setUser);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setErrorMsg("Please enter your ID and password");
+      return;
+    }
     try {
       const responseData = await loginUser(email, password);
       setUser({
@@ -25,9 +30,15 @@ export default function Login() {
       } else {
         navigate("/survey");
       }
+      setErrorMsg(""); // 성공 시 에러 메시지 초기화
     } catch (error) {
       console.error("Login failed", error);
-      // Handle login failure (e.g., show an error message to the user)
+      // API 응답에 따라 에러 메시지 처리
+      if (error?.response?.data?.message) {
+        setErrorMsg(error.response.data.message);
+      } else {
+        setErrorMsg("Invalid email or password");
+      }
     }
   };
 
@@ -37,7 +48,7 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-bg-colortext-center pt-36 pb-20">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-bg-color text-center pt-36 pb-20">
       <div className="text-center">
         <h1 className="text-6xl text-black font-bold italic mb-1">BLINK FIT</h1>
         <p className="text-lg text-text-dark-gray font-normal">
@@ -62,6 +73,9 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {errorMsg && (
+          <div className="text-red-500 text-sm mb-4">{errorMsg}</div>
+        )}
         <PrimaryButton onClick={handleLogin}>Log in</PrimaryButton>
         <div className="w-full flex justify-end">
           <span className="text-sm text-text-dark-gray">
