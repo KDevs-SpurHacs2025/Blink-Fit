@@ -121,6 +121,11 @@ function onResults(results) {
           type: "BLINK_COUNT_UPDATE",
           blinkCount: blinkCount,
         });
+        // React(ScreenTime.jsx)로도 실시간 blinkCount 전달
+        chrome.runtime.sendMessage({
+          type: "BLINK_COUNT_UPDATE",
+          blinkCount: blinkCount,
+        });
       }
     }
     prevEyeClosed = currentEyeClosed;
