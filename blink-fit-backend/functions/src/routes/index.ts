@@ -4,6 +4,7 @@ import { generateGuide } from "../controllers/guideController";
 import { generateExerciseGuide } from "../controllers/exerciseController";
 import { login, getUserProfile } from "../controllers/authController";
 import { updateBlinkCount } from "../controllers/blinkController";
+import { updateSessionSummary } from "../controllers/summaryController";
 
 const router = Router();
 
@@ -26,6 +27,9 @@ router.get("/user/:userId", getUserProfile);
 
 // Blink count tracking
 router.post("/blink-count", updateBlinkCount);
+
+// Session summary
+router.post("/summary", updateSessionSummary);
 
 // 404 handler
 router.use("*", (req, res) => {

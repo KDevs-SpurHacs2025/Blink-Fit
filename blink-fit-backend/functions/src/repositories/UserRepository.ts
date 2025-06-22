@@ -361,4 +361,48 @@ export class UserRepository {
       throw error;
     }
   }
+
+  /**
+   * Update user session summary (recentScreenTimes and recentBreakTimes)
+   */
+  async updateSessionSummary(
+    userId: string, 
+    totalScreenTime: number, 
+    totalBreakTime: number
+  ): Promise<IUserProfile | null> {
+    try {
+      // Update using MongoDB's $push with $slice to maintain only the latest 7 entries
+      const updatedUser = await UserProfile.findByIdAndUpdate(
+        userId,
+        {
+          $push: {
+            recentScreenTimes: {
+              $each: [totalScreenTime],
+              $slice: -7  // Keep only the latest 7 entries
+            },
+            recentBreakTimes: {
+              $each: [totalBreakTime],
+              $slice: -7  // Keep only the latest 7 entries
+            }
+          },
+          $set: {
+            updatedAt: new Date()
+          }
+        },
+        { 
+          new: true, // Return the updated document
+          runValidators: true
+        }
+      );
+
+      if (updatedUser) {
+        console.log(`Session summary updated for user ${userId}: screen=${totalScreenTime}, break=${totalBreakTime}`);
+      }
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating session summary:', error);
+      throw error;
+    }
+  }
 }
