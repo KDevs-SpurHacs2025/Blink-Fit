@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
-import useUserStore from "../store/userStore";
+import useUserStore from "../store/userStore"; // userStore 임포트
 import ConfirmModal from "../components/ConfirmModal";
 import PrimaryButton from "../components/PrimaryButton";
 
@@ -17,6 +17,8 @@ export default function Survey() {
   const progress = step === 1 ? "50%" : "100%";
   const navigate = useNavigate();
   const setSurveyAnswers = useUserStore((state) => state.setSurveyAnswers);
+  // userStore에서 userId를 가져옵니다. (userStore 구조에 따라 user.id 또는 user.userId 등으로 접근)
+  const userIdFromStore = useUserStore((state) => state.user?.id); // 예시: user 객체가 있을 때만 id 접근
 
   const allChoicesAnswered = choiceQuestions.every((q) => answers[q.name]);
   const allInputsFilled = inputQuestions.every((q) => {
@@ -35,7 +37,6 @@ export default function Survey() {
   };
 
   function buildApiPayload() {
-    // 객관식(quiz) 변환
     const quiz = choiceQuestions.map((q, idx) => {
       const selected = q.options.find((opt) => opt.text === answers[q.name]);
       return {
@@ -44,14 +45,13 @@ export default function Survey() {
         level: selected ? selected.level : 0,
       };
     });
-    // 주관식(subjective) 변환
     const subjective = {};
     inputQuestions.forEach((q) => {
       subjective[q.name] = answers[q.name] || "";
     });
-    // userId 예시 (실제 userStore에서 가져와도 됨)
+
     return {
-      userId: "janeDoe@gmail.com",
+      userId: userIdFromStore || "fallbackUserId", // 실제 userId를 사용하거나, 없을 경우 대비 (로그인 필수 가정)
       quiz,
       subjective,
     };
@@ -59,15 +59,43 @@ export default function Survey() {
 
   const handleSave = () => {
     const apiPayload = buildApiPayload();
-    console.log("[Survey] 실제 서버 전송 payload:", apiPayload);
+    console.log("[Survey] 실제 서버 전송 payload:", apiPayload); // 여기서 최종 payload 확인
     setSurveyAnswers(answers);
     setModalPayload(apiPayload);
     setShowModal(true);
+
+    // Debugging logs
+    console.log("[Debug] handleSave called");
+    console.log("[Debug] Generated API Payload:", apiPayload);
+    console.log("[Debug] Answers:", answers);
+    console.log("[Debug] All Choices Answered:", allChoicesAnswered);
+    console.log("[Debug] All Inputs Filled:", allInputsFilled);
   };
 
-  const handleModalConfirm = () => {
+  const handleModalConfirm = async () => {
     setShowModal(false);
-    navigate("/routine");
+
+    const apiPayload = buildApiPayload(); // Confirm 직전에도 최신 payload를 다시 생성
+    try {
+      const response = await fetch("https://api-lcq5pbmy4q-pd.a.run.app/generate-guide", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiPayload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate guide: ${response.status} ${response.statusText}`);
+      }
+      const result = await response.json();
+      console.log("Guide generated successfully:", result);
+
+      navigate("/routine");
+    } catch (error) {
+      console.error("Error generating guide:", error);
+      // Handle error (e.g., show an error message to the user)
+    }
   };
 
   const handleModalCancel = () => {
@@ -76,12 +104,10 @@ export default function Survey() {
 
   const renderModalContent = () => {
     if (!modalPayload) return null;
-    // Map questionId to question text for quiz
     const quizMap = {};
     choiceQuestions.forEach((q, idx) => {
       quizMap[idx + 1] = q.question;
     });
-    // Map subjective name to question text
     const subjectiveMap = {};
     inputQuestions.forEach((q) => {
       subjectiveMap[q.name] = q.question;
