@@ -9,9 +9,11 @@ import Home from "./pages/Home.jsx";
 import Settings from "./pages/Settings.jsx";
 import EyeHealthInfo from "./pages/EyeHealthInfo.jsx";
 import Summary from "./pages/Summary.jsx";
-
+import BreakTime from "./pages/BreakTime.jsx";
 //Screen-Break
 import ScreenTime from "./pages/ScreenTime.jsx";
+import BreakOver from "./pages/BreakOver.jsx";
+import Limit from "./pages/Limit.jsx";
 function App() {
   return (
     <div
@@ -35,6 +37,9 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/eye-health-info" element={<EyeHealthInfo />} />
           <Route path="/summary" element={<Summary />} />
+          <Route path="/break-time" element={<BreakTime />} />
+          <Route path="/break-over" element={<BreakOver />} />
+          <Route path="/limit" element={<Limit />} />
           {/* Add more routes as needed */}
         </Routes>
       </HashRouter>

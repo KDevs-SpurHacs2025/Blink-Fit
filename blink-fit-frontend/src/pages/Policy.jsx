@@ -1,8 +1,14 @@
 import { useNavigate } from "react-router-dom";
+import useUserStore from "../store/userStore";
 import PrimaryButton from "../components/PrimaryButton";
 
 export default function Policy() {
   const navigate = useNavigate();
+  const selectedRoutine = useUserStore((state) => state.selectedRoutine);
+
+  // 선택한 루틴 콘솔 출력
+  console.log("[Policy] 선택한 루틴:", selectedRoutine);
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-bg-color">
       <div className="w-3/4 h-full flex flex-col items-center py-14">

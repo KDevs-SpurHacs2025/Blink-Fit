@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import useUserStore from "../store/userStore";
 import StopWatch from "../assets/icons/stopWatch.svg";
 import Eye from "../assets/icons/eye.svg";
-import Rule from "../assets/icons/rule.svg";
 import Pause from "../assets/icons/pause.svg";
 import Stop from "../assets/icons/stop.svg";
 import Play from "../assets/icons/play.svg";
@@ -18,6 +18,97 @@ export default function ScreenTime() {
   const [isPaused, setIsPaused] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
+  const selectedRoutine = useUserStore((state) => state.selectedRoutine);
+  const addScreenTime = useUserStore((state) => state.addScreenTime);
+  const totalScreenTimeStore = useUserStore((state) => state.totalScreenTime);
+  const surveyAnswers = useUserStore((state) => state.surveyAnswers);
+
+  const startMinutes = Number(selectedRoutine?.screen);
+  const [secondsLeft, setSecondsLeft] = useState(
+    Number.isFinite(startMinutes) && startMinutes > 0 ? startMinutes * 60 : 60
+  );
+
+  // 세션 시작 시점의 secondsLeft를 기억
+  const initialSecondsRef = useRef(
+    Number.isFinite(startMinutes) && startMinutes > 0 ? startMinutes * 60 : 60
+  );
+
+  // selectedRoutine이 바뀔 때마다 secondsLeft, initialSecondsRef 재설정
+  useEffect(() => {
+    const newStart = Number(selectedRoutine?.screen);
+    const newSeconds =
+      Number.isFinite(newStart) && newStart > 0 ? newStart * 60 : 60;
+    setSecondsLeft(newSeconds);
+    initialSecondsRef.current = newSeconds;
+  }, [selectedRoutine]);
+
+  // selectedRoutine이 없거나 잘못된 경우 홈으로 리다이렉트
+  useEffect(() => {
+    if (
+      !selectedRoutine ||
+      typeof selectedRoutine.screen === "undefined" ||
+      !Number.isFinite(Number(selectedRoutine.screen)) ||
+      Number(selectedRoutine.screen) <= 0
+    ) {
+      navigate("/");
+    }
+  }, [selectedRoutine, navigate]);
+
+  useEffect(() => {
+    if (isPaused) return;
+    if (secondsLeft <= 0) {
+      // 실제로 사용한 시간(초)
+      const usedSeconds = initialSecondsRef.current;
+      addScreenTime(usedSeconds);
+      navigate("/break-time");
+      return;
+    }
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isPaused, secondsLeft, navigate, addScreenTime]);
+
+  // Stop(중단) 버튼 눌렀을 때도 누적
+  const handleStop = () => {
+    const usedSeconds = initialSecondsRef.current - secondsLeft;
+    addScreenTime(usedSeconds);
+    navigate("/summary");
+  };
+
+  // 브라우저 종료/새로고침 시에도 누적
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const usedSeconds = initialSecondsRef.current - secondsLeft;
+      addScreenTime(usedSeconds);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [addScreenTime, secondsLeft]);
+
+  // 목표 화면 시간 초과 시 제한 페이지로 이동
+  useEffect(() => {
+    // const screenTimeGoalHour = Number(surveyAnswers?.subjective?.screenTimeGoal);
+    // const screenTimeGoalSec = screenTimeGoalHour * 60 * 60;
+    const screenTimeGoalSec = 130; // 테스트용: 목표 시간 2분 10초(130초)로 고정
+
+    if (totalScreenTimeStore >= screenTimeGoalSec) {
+      navigate("/limit");
+    }
+  }, [totalScreenTimeStore, surveyAnswers, navigate]);
+
+  // 시간 포맷 mm:ss
+  const formatTime = (sec) => {
+    if (!Number.isFinite(sec) || sec < 0) return "00:00";
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  // 디버깅: secondsLeft, startMinutes, selectedRoutine 확인
+  // console.log("[ScreenTime] secondsLeft:", secondsLeft, "startMinutes:", startMinutes, "selectedRoutine:", selectedRoutine);
 
   return (
     <>
@@ -26,7 +117,18 @@ export default function ScreenTime() {
           <div className="flex flex-col items-center mb-6">
             {/* Circle Graph */}
             <div className="flex flex-col items-center mb-2">
-              <CircleTimer startMinutes={1} isPaused={isPaused} />
+              <CircleTimer
+                totalSeconds={
+                  Number.isFinite(startMinutes) && startMinutes > 0
+                    ? startMinutes * 60
+                    : 60
+                }
+                secondsLeft={Number.isFinite(secondsLeft) ? secondsLeft : 0}
+              >
+                <span className="text-3xl font-bold mt-2 text-black">
+                  {formatTime(Number.isFinite(secondsLeft) ? secondsLeft : 0)}
+                </span>
+              </CircleTimer>
             </div>
             {/* Control Buttons */}
             <div className="flex gap-6 mt-2 justify-center">
@@ -110,7 +212,7 @@ export default function ScreenTime() {
         <ConfirmModal
           title="Are you sure you want to stop?"
           message="Stopping now will end tracking, and your current routine progress will not be saved."
-          onConfirm={() => navigate("/summary")}
+          onConfirm={handleStop}
           onCancel={() => setShowConfirm(false)}
         />
       )}
