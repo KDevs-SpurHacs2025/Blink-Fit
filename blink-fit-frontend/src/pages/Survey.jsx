@@ -17,6 +17,7 @@ export default function Survey() {
   const progress = step === 1 ? "50%" : "100%";
   const navigate = useNavigate();
   const setSurveyAnswers = useUserStore((state) => state.setSurveyAnswers);
+  const userId = useUserStore((state) => state.user.id);
 
   const allChoicesAnswered = choiceQuestions.every((q) => answers[q.name]);
   const allInputsFilled = inputQuestions.every((q) => {
@@ -51,7 +52,7 @@ export default function Survey() {
     });
     // userId 예시 (실제 userStore에서 가져와도 됨)
     return {
-      userId: "janeDoe@gmail.com",
+      userId: userId,
       quiz,
       subjective,
     };
