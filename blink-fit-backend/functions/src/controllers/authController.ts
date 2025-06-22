@@ -65,7 +65,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         {
           userId: user._id.toString(), // Return MongoDB ObjectId as string
           username: user.username,
-          issurvey: hasQuiz
+          isSurvey: hasQuiz
         }
       ));
     } else {
