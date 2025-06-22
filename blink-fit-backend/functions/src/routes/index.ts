@@ -3,7 +3,7 @@ import { getHello, postHello, healthCheck } from "../controllers/helloController
 import { generateGuide } from "../controllers/guideController";
 import { generateExerciseGuide } from "../controllers/exerciseController";
 import { upsertBlinkData } from "../controllers/blinkController";
-import { login } from "../controllers/authController";
+import { login, getUserProfile } from "../controllers/authController";
 
 const router = Router();
 
@@ -16,6 +16,7 @@ router.post("/hello", postHello);
 
 // Authentication
 router.post("/login", login);
+router.get("/user/:userId", getUserProfile);
 
 // Guide generation
 router.post("/generate-guide", generateGuide);

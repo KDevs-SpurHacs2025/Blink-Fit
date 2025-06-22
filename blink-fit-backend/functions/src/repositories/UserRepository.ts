@@ -259,7 +259,14 @@ export class UserRepository {
   }
 
   async findByUserId(userId: string): Promise<IUserProfile | null> {
-    return this.findByUsername(userId);
+    try {
+      // Try to find by MongoDB ObjectId first
+      const user = await UserProfile.findById(userId);
+      return user;
+    } catch (error) {
+      console.error("Error finding user by ID:", error);
+      return null;
+    }
   }
 
   async updatePreferences(userId: string, preferences: UserPreferences): Promise<IUserProfile | null> {
