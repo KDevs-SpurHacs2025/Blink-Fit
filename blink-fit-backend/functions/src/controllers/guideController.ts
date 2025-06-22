@@ -106,7 +106,6 @@ export const generateGuide = async (req: Request, res: Response): Promise<void> 
           timestamp: new Date().toISOString(),
           source: "Gemini AI"
         });
-        return; // Explicitly return after sending response
       } catch (parseError) {
         console.error("Gemini guide generation failed:", parseError);
         
@@ -119,7 +118,6 @@ export const generateGuide = async (req: Request, res: Response): Promise<void> 
           timestamp: new Date().toISOString(),
           source: "Fallback Algorithm"
         });
-        return; // Explicitly return after sending response
       }
     } else {
       // Fallback when Gemini is disabled
@@ -131,7 +129,6 @@ export const generateGuide = async (req: Request, res: Response): Promise<void> 
         timestamp: new Date().toISOString(),
         source: "Fallback Algorithm (Gemini disabled)"
       });
-      return; // Explicitly return after sending response
     }
     
   } catch (error) {
@@ -144,6 +141,5 @@ export const generateGuide = async (req: Request, res: Response): Promise<void> 
       undefined,
       error instanceof Error ? error.message : "Unknown error"
     ));
-    return; // Explicitly return after sending response
   }
 };
