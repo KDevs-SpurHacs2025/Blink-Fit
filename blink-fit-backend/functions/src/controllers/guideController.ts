@@ -82,7 +82,7 @@ export const generateGuide = async (req: Request, res: Response) => {
         logger.info("20-20-20 guide generated successfully via Gemini AI");
       } catch (parseError) {
         logger.error("Gemini guide generation failed:", parseError);
-        
+
         // Fallback: 20-20-20 based default guide
         guideData = generate2020FallbackGuide(eyeHealthAnalysis, subjective);
         source = "Enhanced 20-20-20 Fallback Algorithm";
@@ -113,6 +113,7 @@ export const generateGuide = async (req: Request, res: Response) => {
         llmResponse: guideData,
         source
       });
+
       logger.info(`Quiz response saved for user ${username} (ObjectId: ${userId})`);
     } catch (dbError) {
       logger.error("Failed to save quiz response to database:", dbError);
@@ -134,6 +135,7 @@ export const generateGuide = async (req: Request, res: Response) => {
     } catch (updateError) {
       logger.error("Failed to update user profile:", updateError);
       // Continue execution - don't fail the API if profile update fails
+
     }
     
     return res.json({
@@ -151,6 +153,7 @@ export const generateGuide = async (req: Request, res: Response) => {
     return res.status(500).json({
       error: error instanceof Error ? error.message : "Unknown error"
     });
+
   }
 };
 
