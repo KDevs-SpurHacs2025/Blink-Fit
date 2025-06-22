@@ -20,6 +20,7 @@ export default function Login() {
       const responseData = await loginUser(email, password);
       setUser({
         id: responseData.data.userId,
+        email: email,
         username: responseData.data.username,
         survey: responseData.data.isSurvey,
       });

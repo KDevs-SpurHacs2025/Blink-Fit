@@ -17,7 +17,7 @@ const Settings = () => {
         <span className="text-4xl">👤</span>
       </div>
       {/* Email */}
-      <div className="text-base font-normal">{user?.id || "No email"}</div>
+      <div className="text-base font-normal">{user?.email || "No email"}</div>
       {/* Divider */}
       <div className="w-3/4 border-b border-gray-300 m-14"></div>
       {/* Options */}

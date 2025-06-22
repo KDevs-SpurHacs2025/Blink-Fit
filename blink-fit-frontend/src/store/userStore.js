@@ -3,7 +3,10 @@ import { create } from "zustand";
 const useUserStore = create((set) => ({
   user: {
     id: "",
+    email: "",
     pwd: "",
+    username: "",
+    survey: false,
   },
   surveyAnswers: {},
   selectedRoutine: null,
@@ -14,7 +17,7 @@ const useUserStore = create((set) => ({
   totalScreenTime: 0, // 초 단위 누적 스크린타임
   totalBreakTime: 0, // 초 단위 누적 브레이크타임
   oneMoreHourUsed: false, // 한 번만 1시간 연장 허용
-  setUser: (user) => set({ user }),
+  setUser: (user) => set({ user: { ...user } }),
   setSurveyAnswers: (answers) => set({ surveyAnswers: answers }),
   setSelectedRoutine: (routine) => set({ selectedRoutine: routine }),
   setScreenTimeGoal: (goal) => set({ screenTimeGoal: goal }), // 추가: screenTimeGoal setter
@@ -31,7 +34,7 @@ const useUserStore = create((set) => ({
   setOneMoreHourUsed: (used) => set({ oneMoreHourUsed: used }),
   resetUser: () =>
     set({
-      user: { id: "", pwd: "" },
+      user: { id: "", email: "", pwd: "", username: "", survey: false },
       surveyAnswers: {},
       selectedRoutine: null,
       screenTimeGoal: 0,
