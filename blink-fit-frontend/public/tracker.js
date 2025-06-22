@@ -105,11 +105,16 @@ function onResults(results) {
     if (currentEyeClosed && !prevEyeClosed) {
       blinkCount++;
       blinkCountDisplay.textContent = `Blinks: ${blinkCount}`;
-      // 눈 깜빡임 감지 시 background.js로 메시지 전송
+      // Send message to background.js when blink is detected
       if (window.chrome && chrome.runtime) {
+        // Get user information from localStorage
+        const userString = localStorage.getItem("user");
+        const userId = userString ? JSON.parse(userString).id : null;
+        
         chrome.runtime.sendMessage({
           type: "BLINK_DETECTED",
           blinkCount: blinkCount,
+          userId: userId, // Pass logged-in user's ObjectId
         });
       }
     }

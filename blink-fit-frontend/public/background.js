@@ -4,7 +4,14 @@ let latestBlinkCount = 0;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'BLINK_DETECTED') {
-    const userId = message.userId || 'defaultUser';
+    const userId = message.userId;
+    
+    // 사용자가 로그인하지 않은 경우 API 호출 건너뛰기
+    if (!userId) {
+      console.warn('Blink detected but no user logged in. Skipping API call.');
+      return;
+    }
+    
     latestBlinkCount = message.blinkCount;
     sendBlinkCountToBackend(userId, latestBlinkCount);
   }
