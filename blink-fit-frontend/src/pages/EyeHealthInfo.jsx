@@ -1,22 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
+import useUserStore from "../store/userStore";
 
 const EyeHealthInfo = () => {
   const navigate = useNavigate();
-
-  // Placeholder: Replace with actual user answers from state, context, or storage
-  const answers = {
-    wearGlasses: "Glasses",
-    eyeConditions: "Dry eyes",
-    eyeStrain: "Very often",
-    screenHours: "2-6 hours",
-    lightSensitive: "Yes",
-    headaches: "Sometimes",
-    screenTimeGoal: "6",
-    focusSessionLength: "45",
-    breakVibe: "Listening to music",
-  };
+  const surveyAnswers = useUserStore((state) => state.surveyAnswers);
+  const resetSurveyAndRoutine = useUserStore(
+    (state) => state.resetSurveyAndRoutine
+  );
 
   return (
     <div className="w-full h-full flex flex-col items-center bg-white py-8 px-4 overflow-y-auto">
@@ -38,7 +30,7 @@ const EyeHealthInfo = () => {
           <div key={q.name || q.question} className="mb-6">
             <div className="font-semibold text-gray-700 mb-1">{q.question}</div>
             <div className="text-gray-900 pl-2">
-              {answers[q.name] || (
+              {surveyAnswers[q.name] || (
                 <span className="italic text-gray-400">No answer</span>
               )}
             </div>
@@ -48,7 +40,10 @@ const EyeHealthInfo = () => {
       {/* Reset Button */}
       <button
         className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition mb-4"
-        onClick={() => navigate("/survey")}
+        onClick={() => {
+          resetSurveyAndRoutine();
+          navigate("/survey");
+        }}
       >
         Reset
       </button>
