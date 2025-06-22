@@ -17,9 +17,17 @@ export default function BreakTime() {
   const [isStopped, setIsStopped] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [timeLeft, setTimeLeft] = useState(breakMinutes * 60); // seconds
-  // 서버에서 받아올 break 행동 문구를 위한 state
+  // 다양한 break 행동 문구 리스트
+  const breakMessages = [
+    "Why don’t you take a moment to lean back, close your eyes, and enjoy a favorite song?",
+    "Stand up, stretch your arms, and do a little dance!",
+    "Look out the window and count five things you see.",
+    "Take a deep breath, close your eyes, and imagine your favorite place.",
+    "Do 10 quick blinks and smile!",
+  ];
+  // breakMessage를 랜덤으로 선택
   const [breakMessage, setBreakMessage] = useState(
-    "Why don’t you take a moment to lean back, close your eyes, and enjoy a favorite song?"
+    breakMessages[Math.floor(Math.random() * breakMessages.length)]
   );
 
   useEffect(() => {

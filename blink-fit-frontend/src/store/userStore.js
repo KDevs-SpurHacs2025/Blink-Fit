@@ -17,6 +17,7 @@ const useUserStore = create((set) => ({
   totalScreenTime: 0, // 초 단위 누적 스크린타임
   totalBreakTime: 0, // 초 단위 누적 브레이크타임
   oneMoreHourUsed: false, // 한 번만 1시간 연장 허용
+  status: "Normal", // Danger, Warning, Normal 중 하나
   setUser: (user) => {
     localStorage.setItem("user", JSON.stringify(user));
     set({ user: { ...user } });
@@ -31,6 +32,7 @@ const useUserStore = create((set) => ({
   },
   setScreenTimeGoal: (goal) => set({ screenTimeGoal: goal }), // 추가: screenTimeGoal setter
   setRoutineGuide: (guide) => set({ routineGuide: guide }), // 추가: 루틴 가이드 setter
+  setStatus: (status) => set({ status }), // 추가: 상태 설정 setter
   incrementScreenTime: () =>
     set((state) => ({ screenTimeCount: state.screenTimeCount + 1 })),
   incrementBreakTime: () =>
@@ -57,6 +59,7 @@ const useUserStore = create((set) => ({
       totalScreenTime: 0,
       totalBreakTime: 0,
       oneMoreHourUsed: false,
+      status: "Normal", // 초기 상태로 리셋
     });
   },
   resetTimes: () =>
