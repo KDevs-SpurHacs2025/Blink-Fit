@@ -15,8 +15,8 @@ const handleStartEyeTracking = () => {
 const Home = () => {
   const navigate = useNavigate();
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-6 relative bg-bg-color">
-      <div className="w-6/7 h-full pt-6">
+    <div className="w-full h-full gap-6 flex flex-col items-center justify-center bg-bg-color">
+      <div className="w-5/6 h-full pt-6 flex flex-col items-center justify-center ">
         <h2 className="text-xl font-bold mb-4 text-left">
           Screen Time Overview: Last 7 Sessions
         </h2>
@@ -26,11 +26,11 @@ const Home = () => {
             <div className="text-sm font-semibold text-text-dark-gray">
               Total
             </div>
-            <div className="text-2xl font-semibold text-black mb-4">20h</div>
+            <div className="text-xl font-semibold text-black mb-4">20h</div>
             <div className="text-sm font-semibold text-text-dark-gray">
               Average
             </div>
-            <div className="text-2xl font-semibold text-black mb-6">
+            <div className="text-xl font-semibold text-black mb-6">
               5 hours/day
             </div>
             <div className="flex items-start gap-2 mt-2">
@@ -76,8 +76,8 @@ const Home = () => {
             Start Today's Routine &gt;
           </PrimaryButton>
         </div>
+        <NavBar />
       </div>
-      <NavBar />
     </div>
   );
 };
