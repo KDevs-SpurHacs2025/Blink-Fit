@@ -11,7 +11,7 @@ const userRepository = new UserRepository();
 export const updateSessionSummary = async (req: Request, res: Response) => {
   try {
     const { userId, sessionSummary } = req.body;
-    const { totalScreenTime, totalBreakTime } = sessionSummary;
+    const { totalScreenTime, totalBreakTime, breakCompletionRate } = sessionSummary;
 
     // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -39,11 +39,23 @@ export const updateSessionSummary = async (req: Request, res: Response) => {
       });
     }
 
+    // Validate breakCompletionRate if provided
+    if (breakCompletionRate !== undefined) {
+      if (typeof breakCompletionRate !== 'number' || breakCompletionRate < 0 || breakCompletionRate > 100) {
+        return res.status(400).json({
+          success: false,
+          message: "breakCompletionRate must be a number between 0 and 100",
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
     // Update user session summary
     const updatedUser = await userRepository.updateSessionSummary(
       userId,
       totalScreenTime,
-      totalBreakTime
+      totalBreakTime,
+      breakCompletionRate
     );
 
     if (!updatedUser) {
@@ -74,6 +86,7 @@ export const updateSessionSummary = async (req: Request, res: Response) => {
         updatedFields: {
           totalScreenTime,
           totalBreakTime,
+          breakCompletionRate: breakCompletionRate !== undefined ? breakCompletionRate : updatedUser.latestBreakSuccessRate,
           sessionEfficiency: Math.round(sessionEfficiency * 100) / 100 // Round to 2 decimal places
         },
         averageStats: {

@@ -368,27 +368,36 @@ export class UserRepository {
   async updateSessionSummary(
     userId: string, 
     totalScreenTime: number, 
-    totalBreakTime: number
+    totalBreakTime: number,
+    breakCompletionRate?: number
   ): Promise<IUserProfile | null> {
     try {
+      // Prepare update object
+      const updateObject: any = {
+        $push: {
+          recentScreenTimes: {
+            $each: [totalScreenTime],
+            $slice: -7  // Keep only the latest 7 entries
+          },
+          recentBreakTimes: {
+            $each: [totalBreakTime],
+            $slice: -7  // Keep only the latest 7 entries
+          }
+        },
+        $set: {
+          updatedAt: new Date()
+        }
+      };
+
+      // Add breakCompletionRate to latestBreakSuccessRate if provided
+      if (breakCompletionRate !== undefined) {
+        updateObject.$set.latestBreakSuccessRate = breakCompletionRate;
+      }
+
       // Update using MongoDB's $push with $slice to maintain only the latest 7 entries
       const updatedUser = await UserProfile.findByIdAndUpdate(
         userId,
-        {
-          $push: {
-            recentScreenTimes: {
-              $each: [totalScreenTime],
-              $slice: -7  // Keep only the latest 7 entries
-            },
-            recentBreakTimes: {
-              $each: [totalBreakTime],
-              $slice: -7  // Keep only the latest 7 entries
-            }
-          },
-          $set: {
-            updatedAt: new Date()
-          }
-        },
+        updateObject,
         { 
           new: true, // Return the updated document
           runValidators: true
@@ -396,7 +405,7 @@ export class UserRepository {
       );
 
       if (updatedUser) {
-        console.log(`Session summary updated for user ${userId}: screen=${totalScreenTime}, break=${totalBreakTime}`);
+        console.log(`Session summary updated for user ${userId}: screen=${totalScreenTime}, break=${totalBreakTime}${breakCompletionRate !== undefined ? `, breakCompletionRate=${breakCompletionRate}` : ''}`);
       }
       
       return updatedUser;
