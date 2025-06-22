@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import * as logger from "firebase-functions/logger";
 import GeminiService from "../services/geminiService";
 import { createApiResponse, generateFallbackExercise } from "../utils/helpers";
 import { ExerciseRequest } from "../types";
@@ -11,7 +10,7 @@ const geminiService = GeminiService.getInstance();
  */
 export const generateExerciseGuide = async (req: Request, res: Response) => {
   try {
-    logger.info("Exercise guide API called", { structuredData: true });
+    console.info("Exercise guide API called", { structuredData: true });
     
     const { userPreferences, currentBreakCount, workDuration }: ExerciseRequest = req.body;
     
@@ -38,7 +37,7 @@ export const generateExerciseGuide = async (req: Request, res: Response) => {
           "Gemini AI"
         ));
       } catch (parseError) {
-        logger.error("Exercise guide JSON parsing error:", parseError);
+        console.error("Exercise guide JSON parsing error:", parseError);
         
         // Fallback exercise guide
         const fallbackExercise = generateFallbackExercise(userPreferences, currentBreakCount);
@@ -69,7 +68,7 @@ export const generateExerciseGuide = async (req: Request, res: Response) => {
     }
     
   } catch (error) {
-    logger.error("Exercise guide API error:", error);
+    console.error("Exercise guide API error:", error);
     
     res.status(500).json(createApiResponse(
       false,

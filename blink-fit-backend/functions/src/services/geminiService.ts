@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import * as logger from "firebase-functions/logger";
 import { getEnvironment, GEMINI_CONFIG } from "../config";
+import { GuideData } from "../types";
+import { QuizAnswer, SubjectiveData } from "../types/database";
 
 class GeminiService {
   private static instance: GeminiService;
@@ -35,14 +36,14 @@ class GeminiService {
           }
         });
         this.isInitialized = true;
-        logger.info("Gemini API initialization successful");
+        console.info("Gemini API initialization successful");
         return true;
       } else {
-        logger.warn("GOOGLE_API_KEY not set. Running in fallback mode.");
+        console.warn("GOOGLE_API_KEY not set. Running in fallback mode.");
         return false;
       }
     } catch (error) {
-      logger.error("Gemini API initialization failed:", error);
+      console.error("Gemini API initialization failed:", error);
       return false;
     }
   }
@@ -64,7 +65,7 @@ class GeminiService {
       const result = await this.model.generateContent(prompt);
       return result.response.text();
     } catch (error) {
-      logger.error("Gemini content generation failed:", error);
+      console.error("Gemini content generation failed:", error);
       throw error;
     }
   }
@@ -86,25 +87,37 @@ class GeminiService {
     return this.generateContent(prompt);
   }
 
-  public async generateGuide(userId: string, quiz: any[], subjective?: any): Promise<any> {
+  public async generateGuide(userId: string, quiz: QuizAnswer[], subjective?: SubjectiveData): Promise<GuideData> {
+    // Question templates for mapping questionId to readable text
+    const questionTemplates = [
+      'Vision device usage',
+      'Eye conditions',
+      'Eye fatigue frequency', 
+      'Daily screen time',
+      'Break habits',
+      'Light sensitivity',
+      'Headaches/blurred vision'
+    ];
+
     const prompt = `
 You are an eye health specialist AI assistant. Please analyze the user's quiz responses and generate a personalized guide.
 
 **User ID:** ${userId}
 
 **Quiz Responses:**
-1. Vision device: ${quiz[0].answer} (Level: ${quiz[0].level})
-2. Eye conditions: ${quiz[1].answer} (Level: ${quiz[1].level})
-3. Eye fatigue frequency: ${quiz[2].answer} (Level: ${quiz[2].level})
-4. Daily screen time: ${quiz[3].answer} (Level: ${quiz[3].level})
-5. Break habits: ${quiz[4].answer} (Level: ${quiz[4].level})
-6. Light sensitivity: ${quiz[5].answer} (Level: ${quiz[5].level})
-7. Headaches/blurred vision: ${quiz[6].answer} (Level: ${quiz[6].level})
+1. ${questionTemplates[0]}: ${quiz[0]?.answer || 'Not provided'} (Risk Level: ${quiz[0]?.level || 0})
+2. ${questionTemplates[1]}: ${quiz[1]?.answer || 'Not provided'} (Risk Level: ${quiz[1]?.level || 0})
+3. ${questionTemplates[2]}: ${quiz[2]?.answer || 'Not provided'} (Risk Level: ${quiz[2]?.level || 0})
+4. ${questionTemplates[3]}: ${quiz[3]?.answer || 'Not provided'} (Risk Level: ${quiz[3]?.level || 0})
+5. ${questionTemplates[4]}: ${quiz[4]?.answer || 'Not provided'} (Risk Level: ${quiz[4]?.level || 0})
+6. ${questionTemplates[5]}: ${quiz[5]?.answer || 'Not provided'} (Risk Level: ${quiz[5]?.level || 0})
+7. ${questionTemplates[6]}: ${quiz[6]?.answer || 'Not provided'} (Risk Level: ${quiz[6]?.level || 0})
 
 **Personal Preferences:**
+- Screen time goal: ${subjective?.screenTimeGoal || 'Not provided'} hours
+- Focus session length: ${subjective?.focusSessionLength || 'Not provided'} hours
 - Break preference: ${subjective?.breakPreference || 'Not provided'}
 - Favorite snack: ${subjective?.favoriteSnack || 'Not provided'}
-- Favorite place: ${subjective?.favoritePlace || 'Not provided'}
 
 Please respond with the following JSON format based on the comprehensive information above:
 

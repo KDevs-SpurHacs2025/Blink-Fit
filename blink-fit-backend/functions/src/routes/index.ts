@@ -9,14 +9,14 @@ const router = Router();
 router.get("/", healthCheck);
 
 // Hello API endpoints
-router.get("/api/hello", getHello);
-router.post("/api/hello", postHello);
+router.get("/hello", getHello);
+router.post("/hello", postHello);
 
 // Guide generation
-router.post("/api/generate-guide", generateGuide);
+router.post("/generate-guide", generateGuide);
 
 // Exercise guidance
-router.post("/api/exercise-guidance", generateExerciseGuide);
+router.post("/exercise-guidance", generateExerciseGuide);
 
 // 404 handler
 router.use("*", (req, res) => {

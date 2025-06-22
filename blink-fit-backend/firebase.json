@@ -14,5 +14,14 @@
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
-  ]
+  ],
+  "emulators": {
+    "functions": {
+      "port": 5003
+    },
+    "ui": {
+      "enabled": false,
+      "port": 4002
+    }
+  }
 }

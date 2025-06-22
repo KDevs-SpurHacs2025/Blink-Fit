@@ -1,32 +1,81 @@
-import { GuideData, ExerciseGuide, SubjectiveData } from "../types";
+import { GuideData, ExerciseGuide } from "../types";
+import { SubjectiveData, QuizAnswer } from "../types/database";
+
+/**
+ * Calculate risk score based on quiz answers
+ */
+function calculateRiskScore(quiz: QuizAnswer[]): number {
+  // Simple risk scoring based on common problematic answers
+  let score = 0;
+  
+  quiz.forEach((q, index) => {
+    const answer = q.answer.toLowerCase();
+    
+    switch (index) {
+      case 0: // Vision device
+        if (answer.includes('computer') || answer.includes('laptop')) score += 1;
+        break;
+      case 1: // Eye conditions
+        if (answer.includes('yes') || answer.includes('dry') || answer.includes('strain')) score += 1;
+        break;
+      case 2: // Eye fatigue frequency
+        if (answer.includes('often') || answer.includes('always') || answer.includes('frequently')) score += 1;
+        break;
+      case 3: // Daily screen time
+        if (answer.includes('8') || answer.includes('more') || answer.includes('10')) score += 1;
+        break;
+      case 4: // Break habits
+        if (answer.includes('rarely') || answer.includes('never')) score += 1;
+        break;
+      case 5: // Light sensitivity
+        if (answer.includes('high') || answer.includes('very') || answer.includes('sensitive')) score += 1;
+        break;
+      case 6: // Headaches/blurred vision
+        if (answer.includes('often') || answer.includes('yes') || answer.includes('frequently')) score += 1;
+        break;
+    }
+  });
+  
+  return score;
+}
 
 /**
  * Generate fallback guide when Gemini is not available
  */
-export function generateFallbackGuide(quizLevels: number[], subjective?: SubjectiveData): GuideData {
-  // Calculate risk level based on quiz levels
-  const riskScore = quizLevels.reduce((sum, level) => sum + level, 0);
+export function generateFallbackGuide(quiz: QuizAnswer[], subjective?: SubjectiveData): GuideData {
+  // Calculate risk level based on quiz answers
+  const riskScore = calculateRiskScore(quiz);
   
-  // Determine risk level and recommendations
+  // Determine recommendations based on risk score and subjective data
   let workDuration: string;
   let breakDuration: string;
   let screenTimeLimit: string;
   let exercises: string[];
   
-  if (riskScore <= 10) {
+  // Use subjective data if available (convert string to number)
+  if (subjective?.focusSessionLength) {
+    const sessionHours = parseInt(subjective.focusSessionLength) || 1;
+    workDuration = `${sessionHours * 60} minutes`;
+  } else if (riskScore <= 3) {
     workDuration = "45 minutes";
+  } else if (riskScore <= 5) {
+    workDuration = "30 minutes";
+  } else {
+    workDuration = "25 minutes";
+  }
+  
+  if (riskScore <= 3) {
     breakDuration = "10 minutes";
-    screenTimeLimit = "7 hours/day";
+    screenTimeLimit = subjective?.screenTimeGoal ? `${subjective.screenTimeGoal} hours/day` : "7 hours/day";
     exercises = [
       "20-20-20 rule: Every 20 minutes, look at something 20 feet away for 20 seconds",
       "Blink exercises: Close eyes for 2 seconds, then open and blink rapidly 10 times",
       "Eye circles: Slowly move your eyes in circular motions",
       "Focus shifting: Alternate between near and far objects"
     ];
-  } else if (riskScore <= 15) {
-    workDuration = "30 minutes";
+  } else if (riskScore <= 5) {
     breakDuration = "8 minutes";
-    screenTimeLimit = "6 hours/day";
+    screenTimeLimit = subjective?.screenTimeGoal ? `${subjective.screenTimeGoal} hours/day` : "6 hours/day";
     exercises = [
       "20-20-20 rule with extended breaks",
       "Palming: Cover eyes with palms for 30 seconds to relax",
@@ -34,9 +83,8 @@ export function generateFallbackGuide(quizLevels: number[], subjective?: Subject
       "Near-far focusing with conscious blinking"
     ];
   } else {
-    workDuration = "25 minutes";
     breakDuration = "7 minutes";
-    screenTimeLimit = "5 hours/day";
+    screenTimeLimit = subjective?.screenTimeGoal ? `${subjective.screenTimeGoal} hours/day` : "5 hours/day";
     exercises = [
       "Frequent 20-20-20 breaks every 15 minutes",
       "Eye massage: Gently massage temples and around eyes",
@@ -52,8 +100,8 @@ export function generateFallbackGuide(quizLevels: number[], subjective?: Subject
   if (subjective?.favoriteSnack && subjective.favoriteSnack.toLowerCase().includes('coffee')) {
     exercises.push("Take coffee breaks while practicing distance focusing");
   }
-  if (subjective?.favoritePlace && subjective.favoritePlace.toLowerCase().includes('window')) {
-    exercises.push("Use window views for distance focusing exercises");
+  if (subjective?.breakPreference && subjective.breakPreference.toLowerCase().includes('walk')) {
+    exercises.push("Use outdoor walks for distance focusing exercises");
   }
   
   return {
@@ -133,7 +181,7 @@ export function createApiResponse<T>(
 }
 
 /**
- * Validate quiz data
+ * Validate quiz data (new API format)
  */
 export function validateQuizData(userId: string, quiz: any[]): { isValid: boolean; error?: string } {
   if (!userId) {
@@ -144,14 +192,29 @@ export function validateQuizData(userId: string, quiz: any[]): { isValid: boolea
     return { isValid: false, error: "quiz must be an array" };
   }
   
-  if (quiz.length !== 7) {
-    return { isValid: false, error: "quiz must contain exactly 7 answers" };
+  if (quiz.length < 1 || quiz.length > 10) {
+    return { isValid: false, error: "quiz must contain between 1 and 10 answers" };
   }
   
   for (let i = 0; i < quiz.length; i++) {
     const item = quiz[i];
-    if (!item.hasOwnProperty('answer') || !item.hasOwnProperty('level')) {
-      return { isValid: false, error: `quiz[${i}] must have 'answer' and 'level' properties` };
+    
+    // Validate required fields for new API format
+    if (!item.hasOwnProperty('answer')) {
+      return { isValid: false, error: `quiz[${i}] must have 'answer' property` };
+    }
+    
+    if (!item.hasOwnProperty('level')) {
+      return { isValid: false, error: `quiz[${i}] must have 'level' property` };
+    }
+    
+    if (typeof item.level !== 'number' || item.level < 0 || item.level > 2) {
+      return { isValid: false, error: `quiz[${i}].level must be a number between 0 and 2` };
+    }
+    
+    // Set questionId if not provided
+    if (!item.questionId) {
+      item.questionId = i + 1;
     }
   }
   
