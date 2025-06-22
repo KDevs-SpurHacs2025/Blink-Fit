@@ -10,11 +10,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-const BACKEND_URL = 'http://localhost:5001/kdev-59789/northamerica-northeast2';
+const BACKEND_URL = 'https://api-lcq5pbmy4q-pd.a.run.app';
 
 async function sendBlinkCountToBackend(userId, blinkCount) {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/api/blink-count`, {
+    const response = await fetch(`${BACKEND_URL}/api/blink-count`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, blinkCount }),
@@ -31,7 +31,7 @@ async function sendBlinkCountToBackend(userId, blinkCount) {
 
 setInterval(async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api`);
+    const response = await fetch(`${BACKEND_URL}/`);
     if (response.ok) {
       const data = await response.json();
       if (data && data.signal) {
