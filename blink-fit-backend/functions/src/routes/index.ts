@@ -2,7 +2,9 @@ import { Router } from "express";
 import { getHello, postHello, healthCheck } from "../controllers/helloController";
 import { generateGuide } from "../controllers/guideController";
 import { generateExerciseGuide } from "../controllers/exerciseController";
-import { upsertBlinkData } from "../controllers/blinkController";
+import { login, getUserProfile } from "../controllers/authController";
+import { updateBlinkCount } from "../controllers/blinkController";
+import { updateSessionSummary } from "../controllers/summaryController";
 
 const router = Router();
 
@@ -19,8 +21,15 @@ router.post("/generate-guide", generateGuide);
 // Exercise guidance
 router.post("/exercise-guidance", generateExerciseGuide);
 
-// Recevive user blinking data
-router.post("/api/blink-count", upsertBlinkData);
+// Authentication & User endpoints
+router.post("/login", login);
+router.get("/user/:userId", getUserProfile);
+
+// Blink count tracking
+router.post("/blink-count", updateBlinkCount);
+
+// Session summary
+router.post("/summary", updateSessionSummary);
 
 // 404 handler
 router.use("*", (req, res) => {

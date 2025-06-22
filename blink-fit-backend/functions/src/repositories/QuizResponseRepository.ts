@@ -142,4 +142,74 @@ export class QuizResponseRepository {
       throw error;
     }
   }
+
+  /**
+   * Save a comprehensive quiz response with analysis and LLM results
+   */
+  async saveQuizResponse(data: {
+    userId: string;
+    responses: Array<{
+      questionId: number;
+      question: string;
+      answer: string;
+      level: number;
+    }>;
+    subjective: {
+      breakPreference: string;
+      favoriteSnack: string;
+      screenTimeGoal: number;
+      focusSessionLength: number;
+    };
+    analysisResults: any;
+    llmResponse: any;
+    source: string;
+  }): Promise<IQuizResponse> {
+    try {
+      // Convert to the expected format
+      const responses: IQuizAnswer[] = data.responses.map(r => ({
+        questionId: r.questionId,
+        question: r.question,
+        answer: r.answer,
+        level: r.level
+      }));
+
+      const subjective: ISubjectiveData = {
+        screenTimeGoal: data.subjective.screenTimeGoal.toString(),
+        focusSessionLength: data.subjective.focusSessionLength.toString(),
+        breakPreference: data.subjective.breakPreference,
+        favoriteSnack: data.subjective.favoriteSnack
+      };
+
+      // Check if quiz response already exists for this user
+      const existingQuizResponse = await QuizResponse.findOne({ userId: data.userId });
+
+      if (existingQuizResponse) {
+        // Update existing quiz response
+        existingQuizResponse.responses = responses;
+        existingQuizResponse.subjective = subjective;
+        existingQuizResponse.submittedAt = new Date();
+
+        await existingQuizResponse.save();
+        console.log(`Quiz response updated for user ${data.userId} with session ${existingQuizResponse.sessionId}`);
+        return existingQuizResponse;
+      } else {
+        // Create new quiz response
+        const sessionId = uuidv4();
+        
+        const quizResponse = new QuizResponse({
+          userId: data.userId,
+          sessionId,
+          responses,
+          subjective
+        });
+
+        await quizResponse.save();
+        console.log(`New quiz response created for user ${data.userId} with session ${sessionId}`);
+        return quizResponse;
+      }
+    } catch (error) {
+      console.error('Error saving quiz response:', error);
+      throw error;
+    }
+  }
 }

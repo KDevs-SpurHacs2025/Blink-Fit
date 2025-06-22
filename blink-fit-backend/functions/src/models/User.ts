@@ -13,6 +13,7 @@ export interface IUserProfile extends Document {
   
   // Login information
   username: string;
+  email: string;
   passwordHash: string;
 
   // Creation/update time
@@ -43,11 +44,17 @@ const UserProfileSchema: Schema = new Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
-    index: true,
     trim: true,
     minlength: 3,
     maxlength: 50
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true,
+    trim: true,
+    lowercase: true
   },
   passwordHash: {
     type: String,

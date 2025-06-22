@@ -62,6 +62,35 @@ export class UserRepository {
   }
 
   /**
+   * Authenticate user with email and password
+   */
+  async authenticateUserByEmail(email: string, password: string): Promise<IUserProfile | null> {
+    try {
+      // First try to find by email field
+      let user = await UserProfile.findOne({ email: email });
+      
+      // If not found, try to find by username field (for backward compatibility)
+      if (!user) {
+        user = await UserProfile.findOne({ username: email });
+      }
+      
+      if (!user) {
+        return null;
+      }
+
+      const isValidPassword = await user.comparePassword(password);
+      if (!isValidPassword) {
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error authenticating user by email:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Update user preferences and behavior data
    */
   async updateUserData(
@@ -190,6 +219,11 @@ export class UserRepository {
       
       if (breakPreference) {
         preferences.breakVibe = breakPreference;
+        // Also add to hobbies array (breakPreference → hobbies mapping)
+        const currentHobbies = user.hobbies || [];
+        if (!currentHobbies.includes(breakPreference)) {
+          user.hobbies = [...currentHobbies, breakPreference];
+        }
       }
       
       if (favoriteSnack) {
@@ -259,10 +293,116 @@ export class UserRepository {
   }
 
   async findByUserId(userId: string): Promise<IUserProfile | null> {
-    return this.findByUsername(userId);
+    try {
+      // Try to find by MongoDB ObjectId first
+      const user = await UserProfile.findById(userId);
+      return user;
+    } catch (error) {
+      console.error("Error finding user by ID:", error);
+      return null;
+    }
   }
 
   async updatePreferences(userId: string, preferences: UserPreferences): Promise<IUserProfile | null> {
     return this.updateUserData(userId, { preferences });
+  }
+
+  /**
+   * Update user blink count with simple average calculation
+   */
+  async updateBlinkCount(userId: string, newBlinkCount: number): Promise<IUserProfile | null> {
+    try {
+      const user = await UserProfile.findById(userId);
+      if (!user) {
+        return null;
+      }
+
+      // Simple average: (existing average + new value) / 2
+      const currentAverage = user.latestBlinkCount || 0;
+      const newAverage = currentAverage === 0 ? newBlinkCount : (currentAverage + newBlinkCount) / 2;
+      
+      user.latestBlinkCount = Math.round(newAverage * 100) / 100; // Round to 2 decimal places
+      user.updatedAt = new Date();
+
+      await user.save();
+      console.log(`User ${userId} blink count updated: ${currentAverage} -> ${user.latestBlinkCount}`);
+      return user;
+    } catch (error) {
+      console.error('Error updating user blink count:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user has completed any quiz responses
+   * Note: quiz_responses collection uses username as userId, not ObjectId
+   */
+  async hasQuizResponses(username: string): Promise<boolean> {
+    try {
+      const QuizResponse = require('../models/QuizResponse').default;
+      const quizCount = await QuizResponse.countDocuments({ userId: username });
+      console.log(`Checking quiz responses for username: ${username}, count: ${quizCount}`);
+      return quizCount > 0;
+    } catch (error) {
+      console.error('Error checking quiz responses:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Find user by ObjectId
+   */
+  async findById(userId: string): Promise<IUserProfile | null> {
+    try {
+      const user = await UserProfile.findById(userId);
+      return user;
+    } catch (error) {
+      console.error('Error finding user by ID:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update user session summary (recentScreenTimes and recentBreakTimes)
+   */
+  async updateSessionSummary(
+    userId: string, 
+    totalScreenTime: number, 
+    totalBreakTime: number
+  ): Promise<IUserProfile | null> {
+    try {
+      // Update using MongoDB's $push with $slice to maintain only the latest 7 entries
+      const updatedUser = await UserProfile.findByIdAndUpdate(
+        userId,
+        {
+          $push: {
+            recentScreenTimes: {
+              $each: [totalScreenTime],
+              $slice: -7  // Keep only the latest 7 entries
+            },
+            recentBreakTimes: {
+              $each: [totalBreakTime],
+              $slice: -7  // Keep only the latest 7 entries
+            }
+          },
+          $set: {
+            updatedAt: new Date()
+          }
+        },
+        { 
+          new: true, // Return the updated document
+          runValidators: true
+        }
+      );
+
+      if (updatedUser) {
+        console.log(`Session summary updated for user ${userId}: screen=${totalScreenTime}, break=${totalBreakTime}`);
+      }
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating session summary:', error);
+      throw error;
+    }
   }
 }
