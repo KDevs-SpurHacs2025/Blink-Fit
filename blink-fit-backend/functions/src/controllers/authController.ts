@@ -214,7 +214,8 @@ Examples: "Screen time shows increasing trend this week", "Usage decreasing afte
       weeklyTrend: weeklyTrend,
       screenTimeGoal: user.screenTimeGoalHours || 8,
       focusSessionLength: user.focusSessionLengthMinutes || 60,
-      hobbies: user.hobbies || []
+      hobbies: user.hobbies || [],
+      breakCompletionRate: user.latestBreakSuccessRate || 0
     };
 
     res.json(createApiResponse(
