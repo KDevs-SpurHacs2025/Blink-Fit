@@ -7,6 +7,7 @@ const useUserStore = create((set) => ({
   },
   surveyAnswers: {},
   selectedRoutine: null,
+  screenTimeGoal: 0, // 추가: 입력받은 screenTimeGoal 값 저장
   screenTimeCount: 0,
   breakTimeCount: 0,
   breakCompletionCount: 0,
@@ -15,6 +16,7 @@ const useUserStore = create((set) => ({
   setUser: (user) => set({ user }),
   setSurveyAnswers: (answers) => set({ surveyAnswers: answers }),
   setSelectedRoutine: (routine) => set({ selectedRoutine: routine }),
+  setScreenTimeGoal: (goal) => set({ screenTimeGoal: goal }), // 추가: screenTimeGoal setter
   incrementScreenTime: () =>
     set((state) => ({ screenTimeCount: state.screenTimeCount + 1 })),
   incrementBreakTime: () =>
@@ -30,13 +32,13 @@ const useUserStore = create((set) => ({
       user: { id: "", pwd: "" },
       surveyAnswers: {},
       selectedRoutine: null,
+      screenTimeGoal: 0,
       screenTimeCount: 0,
       breakTimeCount: 0,
       breakCompletionCount: 0,
       totalScreenTime: 0,
       totalBreakTime: 0,
     }),
-
 }));
 
 export default useUserStore;

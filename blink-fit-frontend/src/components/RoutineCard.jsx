@@ -35,7 +35,7 @@ const RoutineCard = ({
       />
     )}
     <p className="text-sm text-text-dark-gray">{description}</p>
-    <h2 className="text-xl font-bold mb-5">{title}</h2>
+    <h2 className="text-black text-xl font-bold mb-5">{title}</h2>
     <div className="text-black mb-1 flex items-center gap-2">
       <img src={LaptopIcon} alt="laptop" className="w-3" />
       <span className="font-medium">{screenTime}</span> screen time

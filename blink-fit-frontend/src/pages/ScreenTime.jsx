@@ -22,6 +22,7 @@ export default function ScreenTime() {
   const addScreenTime = useUserStore((state) => state.addScreenTime);
   const totalScreenTimeStore = useUserStore((state) => state.totalScreenTime);
   const surveyAnswers = useUserStore((state) => state.surveyAnswers);
+  const screenTimeGoal = useUserStore((state) => state.screenTimeGoal);
 
   const startMinutes = Number(selectedRoutine?.screen);
   const [secondsLeft, setSecondsLeft] = useState(
@@ -160,7 +161,7 @@ export default function ScreenTime() {
                 className="w-4 h-4 mb-2"
               />
               <div className="text-xs font-bold text-black text-center w-full">
-                {totalScreenTime}h
+                {Number(screenTimeGoal)}h
               </div>
               <div className="text-[0.625rem] text-gray-500 whitespace-nowrap w-full text-center">
                 Total Screen Time
