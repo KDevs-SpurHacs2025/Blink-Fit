@@ -13,6 +13,7 @@ const useUserStore = create((set) => ({
   breakCompletionCount: 0,
   totalScreenTime: 0, // 초 단위 누적 스크린타임
   totalBreakTime: 0, // 초 단위 누적 브레이크타임
+  oneMoreHourUsed: false, // 한 번만 1시간 연장 허용
   setUser: (user) => set({ user }),
   setSurveyAnswers: (answers) => set({ surveyAnswers: answers }),
   setSelectedRoutine: (routine) => set({ selectedRoutine: routine }),
@@ -27,6 +28,7 @@ const useUserStore = create((set) => ({
     set((state) => ({ totalScreenTime: state.totalScreenTime + seconds })),
   addBreakTime: (seconds) =>
     set((state) => ({ totalBreakTime: state.totalBreakTime + seconds })),
+  setOneMoreHourUsed: (used) => set({ oneMoreHourUsed: used }),
   resetUser: () =>
     set({
       user: { id: "", pwd: "" },
@@ -38,6 +40,7 @@ const useUserStore = create((set) => ({
       breakCompletionCount: 0,
       totalScreenTime: 0,
       totalBreakTime: 0,
+      oneMoreHourUsed: false,
     }),
 }));
 
