@@ -46,8 +46,8 @@ export default function Summary() {
       }
 
       // Convert time to hours (seconds → hours)
-      const screenTimeHours = totalScreenTime / 3600;
-      const breakTimeHours = totalBreakTime / 3600;
+      const screenTimeHours = totalScreenTime ;
+      const breakTimeHours = totalBreakTime ;
 
       console.log('Sending session summary:', {
         userId,
