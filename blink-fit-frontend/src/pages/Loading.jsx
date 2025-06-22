@@ -16,23 +16,23 @@ export default function Loading() {
   } = location.state || {};
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowButton(true), 1200);
+    const timer = setTimeout(() => setShowButton(true), 1400);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-color">
       <motion.div
-        initial={{ y: 80, opacity: 0 }}
+        initial={{ y: 55, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className=" w-3/4 text-xl text-center font-bold text-black mb-4"
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="text-4xl text-center font-semibold text-black mb-2"
       >
         {title}
       </motion.div>
       {subText && (
         <motion.div
-          initial={{ y: 40, opacity: 0 }}
+          initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0, ease: "easeOut" }}
           className="w-3/4 text-xl text-center font-medium text-black mb-3"

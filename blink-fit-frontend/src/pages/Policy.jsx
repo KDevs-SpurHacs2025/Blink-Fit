@@ -30,7 +30,7 @@ export default function Policy() {
                 title: "You’re all set!",
                 subText:
                   "We’ve personalized your journey based on your answers. Let’s turn your answers into better screen habits",
-                buttonText: "Start",
+                buttonText: "Start >",
                 next: "/home",
               },
             })
