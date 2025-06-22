@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import useUserStore from "../store/userStore";
 
 export default function Policy() {
   const navigate = useNavigate();
+  const selectedRoutine = useUserStore((state) => state.selectedRoutine);
+
+  // 선택한 루틴 콘솔 출력
+  console.log("[Policy] 선택한 루틴:", selectedRoutine);
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 p-8">
       <h1 className="text-3xl font-bold text-black mb-6 text-center">
