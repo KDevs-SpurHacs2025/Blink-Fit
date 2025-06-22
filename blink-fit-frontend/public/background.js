@@ -4,22 +4,23 @@ let latestBlinkCount = 0;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'BLINK_DETECTED') {
+    const userId = message.userId || 'defaultUser';
     latestBlinkCount = message.blinkCount;
-    sendBlinkCountToBackend(latestBlinkCount);
+    sendBlinkCountToBackend(userId, latestBlinkCount);
   }
 });
 
-const BACKEND_URL = 'http://127.0.0.1:8000';
+const BACKEND_URL = 'http://localhost:5001/kdev-59789/northamerica-northeast2';
 
-async function sendBlinkCountToBackend(blinkCount) {
+async function sendBlinkCountToBackend(userId, blinkCount) {
   try {
-    const response = await fetch(`${BACKEND_URL}/blink-count`, {
+    const response = await fetch(`${BACKEND_URL}/api/api/blink-count`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ blinkCount }),
+      body: JSON.stringify({ userId, blinkCount }),
     });
     if (response.ok) {
-      console.log('Blink count sent to backend:', blinkCount);
+      console.log('Blink count sent to backend:', { userId, blinkCount });
     } else {
       console.error('Failed to send blink count to backend:', response.status);
     }
@@ -30,7 +31,7 @@ async function sendBlinkCountToBackend(blinkCount) {
 
 setInterval(async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/signal`);
+    const response = await fetch(`${BACKEND_URL}/api`);
     if (response.ok) {
       const data = await response.json();
       if (data && data.signal) {

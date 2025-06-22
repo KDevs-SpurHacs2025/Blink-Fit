@@ -36,6 +36,7 @@ const useUserStore = create((set) => ({
       totalScreenTime: 0,
       totalBreakTime: 0,
     }),
+
 }));
 
 export default useUserStore;

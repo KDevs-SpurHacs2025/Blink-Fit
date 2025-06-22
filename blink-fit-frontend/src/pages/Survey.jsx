@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
-
 import useUserStore from "../store/userStore";
 import ConfirmModal from "../components/ConfirmModal";
 import PrimaryButton from "../components/PrimaryButton";
@@ -160,7 +159,9 @@ export default function Survey() {
                 </h2>
                 {choiceQuestions.map((q) => (
                   <div key={q.name} className="w-full mb-10">
-                    <div className="text-medium mb-2">{q.question}</div>
+                    <div className="text-medium font-medium mb-2">
+                      {q.question}
+                    </div>
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label
@@ -203,7 +204,7 @@ export default function Survey() {
                 </h2>
                 {inputQuestions.map((q) => (
                   <div key={q.name} className="mb-6">
-                    <label className="block mb-2 text-medium font-base">
+                    <label className="block mb-2 text-medium font-medium">
                       {q.question}
                     </label>
                     <input
@@ -218,11 +219,7 @@ export default function Survey() {
                     />
                   </div>
                 ))}
-                <PrimaryButton
-                  onClick={handleSave}
-                  disabled={!allInputsFilled}
-                  className="mt-8"
-                >
+                <PrimaryButton onClick={handleSave} disabled={!allInputsFilled}>
                   Save
                 </PrimaryButton>
               </motion.div>
