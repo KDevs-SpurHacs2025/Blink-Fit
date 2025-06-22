@@ -5,6 +5,7 @@ import CircleTimer from "../components/CircleTimer";
 import Pause from "../assets/icons/pause.svg";
 import Play from "../assets/icons/play.svg";
 import Stop from "../assets/icons/stop.svg";
+import ConfirmModal from "../components/ConfirmModal";
 
 export default function BreakTime() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function BreakTime() {
   const breakMinutes = selectedRoutine?.break || 5; // fallback 5분
   const [isPaused, setIsPaused] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [timeLeft, setTimeLeft] = useState(breakMinutes * 60); // seconds
   // 서버에서 받아올 break 행동 문구를 위한 state
   const [breakMessage, setBreakMessage] = useState(
@@ -33,8 +35,32 @@ export default function BreakTime() {
     return () => clearInterval(timer);
   }, [isPaused, isStopped, timeLeft, navigate, addBreakTime, breakMinutes]);
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // 남은 시간만큼 실제 사용한 break 시간 누적
+      addBreakTime(breakMinutes * 60 - timeLeft);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [addBreakTime, breakMinutes, timeLeft]);
+
   const handlePause = () => setIsPaused((prev) => !prev);
-  const handleStop = () => setIsStopped(true);
+  const handleStop = () => {
+    setIsPaused(true);
+    setShowConfirm(true);
+  };
+
+  const handleConfirmStop = () => {
+    setShowConfirm(false);
+    addBreakTime(breakMinutes * 60 - timeLeft); // 실제 사용한 break 시간 누적
+    navigate("/summary");
+  };
+  const handleCancelStop = () => {
+    setShowConfirm(false);
+    setIsPaused(false);
+  };
 
   // 시간 포맷 mm:ss
   const formatTime = (sec) => {
@@ -83,6 +109,14 @@ export default function BreakTime() {
           <span className="mr-2">🎵</span>
           <span>{breakMessage}</span>
         </div>
+        {showConfirm && (
+          <ConfirmModal
+            title="Are you sure you want to stop?"
+            message="Stopping now will end your break and take you to the summary."
+            onConfirm={handleConfirmStop}
+            onCancel={handleCancelStop}
+          />
+        )}
       </div>
     </div>
   );

@@ -63,7 +63,12 @@ const Home = () => {
         </div>
         {/* Grid 4 */}
         <div className="w-full flex justify-center mt-2">
-          <PrimaryButton onClick={() => navigate("/screen-time")}>
+          <PrimaryButton
+            onClick={() => {
+              handleStartEyeTracking();
+              navigate("/screen-time");
+            }}
+          >
             Start Today's Routine &gt;
           </PrimaryButton>
         </div>

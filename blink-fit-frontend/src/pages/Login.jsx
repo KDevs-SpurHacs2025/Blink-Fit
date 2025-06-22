@@ -6,6 +6,8 @@ import PrimaryButton from "../components/PrimaryButton";
 export default function Login() {
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = () => {
     setUser({ id: email, pwd: password });
