@@ -24,15 +24,18 @@ export default function Login() {
         username: responseData.data.username,
         survey: responseData.data.isSurvey,
       });
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: responseData.data.userId,
-          email: email,
-          username: responseData.data.username,
-          survey: responseData.data.isSurvey,
-        })
-      );
+      const userObj = {
+        id: responseData.data.userId,
+        email: email,
+        username: responseData.data.username,
+        survey: responseData.data.isSurvey,
+      };
+      localStorage.setItem("user", JSON.stringify(userObj));
+      // chrome.storage.local에도 동기화
+      if (window.chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ user: userObj });
+        console.log("user info synced to chrome.storage.local (login):", userObj);
+      }
 
       // Redirect based on survey status
       if (responseData.data.isSurvey) {
