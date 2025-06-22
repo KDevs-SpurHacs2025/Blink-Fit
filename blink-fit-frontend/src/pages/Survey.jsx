@@ -91,6 +91,21 @@ export default function Survey() {
       const result = await response.json();
       console.log("Guide generated successfully:", result);
 
+      // 숫자만 추출해서 int로 변환
+      const breakDurationInt = parseInt(result.guide.breakDuration.match(/\d+/)?.[0] || "0", 10);
+      const screenTimeLimitInt = parseInt(result.guide.screenTimeLimit.match(/\d+/)?.[0] || "0", 10);
+      const workDurationInt = parseInt(result.guide.workDuration.match(/\d+/)?.[0] || "0", 10);
+      console.log("breakDurationInt:", breakDurationInt);
+      console.log("screenTimeLimitInt:", screenTimeLimitInt);
+      console.log("workDurationInt:", workDurationInt);
+
+      // 추출한 값을 userStore에 저장
+      useUserStore.getState().setRoutineGuide({
+        breakDuration: breakDurationInt,
+        screenTimeLimit: screenTimeLimitInt,
+        workDuration: workDurationInt,
+      });
+
       navigate("/routine");
     } catch (error) {
       console.error("Error generating guide:", error);
