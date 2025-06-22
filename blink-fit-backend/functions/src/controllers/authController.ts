@@ -12,13 +12,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log("Login API called");
     
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     
     // Input validation
-    if (!username || !password) {
+    if (!email || !password) {
       res.status(400).json(createApiResponse(
         false,
-        "Username and password are required",
+        "Email and password are required",
         undefined,
         undefined,
         "Missing required fields"
@@ -26,10 +26,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     
-    if (typeof username !== 'string' || typeof password !== 'string') {
+    if (typeof email !== 'string' || typeof password !== 'string') {
       res.status(400).json(createApiResponse(
         false,
-        "Username and password must be strings",
+        "Email and password must be strings",
         undefined,
         undefined,
         "Invalid field types"
@@ -37,10 +37,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     
-    if (username.trim() === '' || password.trim() === '') {
+    if (email.trim() === '' || password.trim() === '') {
       res.status(400).json(createApiResponse(
         false,
-        "Username and password cannot be empty",
+        "Email and password cannot be empty",
         undefined,
         undefined,
         "Empty fields"
@@ -51,24 +51,28 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     // Ensure database connection
     await connectDB();
 
-    // Authenticate user
-    const user = await userRepository.authenticateUser(username.trim(), password);
+    // Authenticate user by email
+    const user = await userRepository.authenticateUserByEmail(email.trim(), password);
     
     if (user) {
+      // Check if user has completed any quiz responses
+      const hasQuiz = await userRepository.hasQuizResponses(user._id.toString());
+      
       // Login successful
       res.json(createApiResponse(
         true,
         "Login successful",
         {
           userId: user._id.toString(), // Return MongoDB ObjectId as string
-          username: user.username
+          username: user.username,
+          issurvey: hasQuiz
         }
       ));
     } else {
       // Login failed
       res.status(401).json(createApiResponse(
         false,
-        "Invalid username or password",
+        "Invalid email or password",
         undefined,
         undefined,
         "Authentication failed"

@@ -62,6 +62,28 @@ export class UserRepository {
   }
 
   /**
+   * Authenticate user with email and password
+   */
+  async authenticateUserByEmail(email: string, password: string): Promise<IUserProfile | null> {
+    try {
+      const user = await UserProfile.findOne({ username: email }); // Using username field for email
+      if (!user) {
+        return null;
+      }
+
+      const isValidPassword = await user.comparePassword(password);
+      if (!isValidPassword) {
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error authenticating user by email:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Update user preferences and behavior data
    */
   async updateUserData(
@@ -296,6 +318,20 @@ export class UserRepository {
     } catch (error) {
       console.error('Error updating user blink count:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Check if user has completed any quiz responses
+   */
+  async hasQuizResponses(userId: string): Promise<boolean> {
+    try {
+      const QuizResponse = require('../models/QuizResponse').default;
+      const quizCount = await QuizResponse.countDocuments({ userId });
+      return quizCount > 0;
+    } catch (error) {
+      console.error('Error checking quiz responses:', error);
+      return false;
     }
   }
 }
