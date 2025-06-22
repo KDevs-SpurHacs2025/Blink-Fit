@@ -35,7 +35,7 @@ export default function Survey() {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-color overflow-hidden">
+    <div className="w-full h-full flex items-center justify-center bg-bg-color overflow-hidden">
       <div className="w-3/4 h-full flex flex-col items-center">
         {/* Progress bar */}
         <div className="w-3/4 h-2 bg-[#D9D9D9] rounded-full mt-10 mb-12">
@@ -61,7 +61,7 @@ export default function Survey() {
                 </h2>
                 {choiceQuestions.map((q) => (
                   <div key={q.name} className="w-full mb-10">
-                    <p className="text-medium mb-2">{q.question}</p>
+                    <p className="text-base font-medium mb-3">{q.question}</p>
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label
@@ -102,7 +102,7 @@ export default function Survey() {
                 </h2>
                 {inputQuestions.map((q) => (
                   <div key={q.name} className="mb-6">
-                    <label className="block mb-2 text-medium font-base">
+                    <label className="block mb-2 text-medium font-medium">
                       {q.question}
                     </label>
                     <input
@@ -117,11 +117,7 @@ export default function Survey() {
                     />
                   </div>
                 ))}
-                <PrimaryButton
-                  onClick={handleSave}
-                  disabled={!allInputsFilled}
-                  className="mt-8"
-                >
+                <PrimaryButton onClick={handleSave} disabled={!allInputsFilled}>
                   Save
                 </PrimaryButton>
               </motion.div>

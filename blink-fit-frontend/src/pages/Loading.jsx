@@ -44,7 +44,7 @@ export default function Loading() {
         initial={false}
         animate={{ opacity: showButton ? 1 : 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-transparent text-black text-md hover:underline transition focus:outline-none border-none"
+        className="bg-transparent text-black text-md font-normal hover:underline transition focus:outline-none border-none"
         onClick={() => navigate(next)}
         style={{ pointerEvents: showButton ? "auto" : "none" }}
       >
