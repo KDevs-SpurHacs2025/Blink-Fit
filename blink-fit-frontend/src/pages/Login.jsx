@@ -1,53 +1,76 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/authApi";
 import useUserStore from "../store/userStore";
 import PrimaryButton from "../components/PrimaryButton";
-
-const handleStartEyeTracking = () => {
-  const trackerUrl = chrome.runtime.getURL("tracker.html");
-  window.open(trackerUrl, "_blank", "width=800,height=600");
-};
 
 export default function Login() {
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  // Simulate a Google login by setting a user
-  // In a real application, you would handle the OAuth flow here
-  const handleGoogleLogin = () => {
+  const handleLogin = async () => {
+    try {
+      const responseData = await loginUser(email, password);
+      setUser({
+        id: responseData.data.userId,
+        username: responseData.data.username,
+        survey: responseData.data.isSurvey,
+      });
+
+      // Redirect based on survey status
+      if (responseData.data.isSurvey) {
+        navigate("/home");
+      } else {
+        navigate("/survey");
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+      // Handle login failure (e.g., show an error message to the user)
+    }
+  };
+
+  const handleGuest = () => {
     setUser({ id: "janeDoe@gmail.com", pwd: "!Jane123" });
     navigate("/survey");
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-between bg-color text-center pt-40 pb-20">
-      <div>
-        <h1 className="text-6xl text-black font-extrabold italic mb-1">
-          BLINK FIT
-        </h1>
-        <p className="text-lg text-dark-gray font-normal">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-bg-colortext-center pt-36 pb-20">
+      <div className="text-center">
+        <h1 className="text-6xl text-black font-bold italic mb-1">BLINK FIT</h1>
+        <p className="text-lg text-text-dark-gray font-normal">
           Digital life meets mindful habits
         </p>
       </div>
-      <div className="w-3/4">
-        <PrimaryButton onClick={() => navigate("/loading")}>
-          Continue with Google
-        </PrimaryButton>
-        <button
-          onClick={() => navigate("/loading")}
-          className="w-full border border-primary py-3 rounded-lg hover:bg-opacity-90 mb-4 transition"
-        >
-          Enter as guest
-        </button>
-        {/* <button
-          onClick={handleStartEyeTracking}
-          className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 w-full mt-4 transition"
-          type="button"
-        >
-          Start Eye Tracking (New Page)
-        </button>
-        <button onClick={() => navigate("/screen-time")}>
-          Check Screen Time
-        </button> */}
+      <div className="w-3/4 max-w-md bg-white rounded-xl shadow-md p-8 mt-20 flex flex-col">
+        <div className="flex items-center justify-between mb-7">
+          <span className="text-2xl font-medium text-black">Sign in</span>
+        </div>
+        <input
+          type="email"
+          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="jane.doe@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          className="w-full border border-gray-300 rounded-lg p-3 text-base mb-10 focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <PrimaryButton onClick={handleLogin}>Log in</PrimaryButton>
+        <div className="w-full flex justify-end">
+          <span className="text-sm text-text-dark-gray">
+            Don't have an account?{" "}
+            <a href="#" className="underline">
+              Sign up
+            </a>
+          </span>
+        </div>
       </div>
     </div>
   );
