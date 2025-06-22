@@ -2,8 +2,8 @@ import { Router } from "express";
 import { getHello, postHello, healthCheck } from "../controllers/helloController";
 import { generateGuide } from "../controllers/guideController";
 import { generateExerciseGuide } from "../controllers/exerciseController";
-import { upsertBlinkData } from "../controllers/blinkController";
 import { login, getUserProfile } from "../controllers/authController";
+import { updateBlinkCount } from "../controllers/blinkController";
 
 const router = Router();
 
@@ -14,18 +14,18 @@ router.get("/", healthCheck);
 router.get("/hello", getHello);
 router.post("/hello", postHello);
 
-// Authentication
-router.post("/login", login);
-router.get("/user/:userId", getUserProfile);
-
 // Guide generation
 router.post("/generate-guide", generateGuide);
 
 // Exercise guidance
 router.post("/exercise-guidance", generateExerciseGuide);
 
-// Recevive user blinking data
-router.post("/api/blink-count", upsertBlinkData);
+// Authentication & User endpoints
+router.post("/login", login);
+router.get("/user/:userId", getUserProfile);
+
+// Blink count tracking
+router.post("/blink-count", updateBlinkCount);
 
 // 404 handler
 router.use("*", (req, res) => {

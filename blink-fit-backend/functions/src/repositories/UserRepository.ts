@@ -272,4 +272,30 @@ export class UserRepository {
   async updatePreferences(userId: string, preferences: UserPreferences): Promise<IUserProfile | null> {
     return this.updateUserData(userId, { preferences });
   }
+
+  /**
+   * Update user blink count with simple average calculation
+   */
+  async updateBlinkCount(userId: string, newBlinkCount: number): Promise<IUserProfile | null> {
+    try {
+      const user = await UserProfile.findById(userId);
+      if (!user) {
+        return null;
+      }
+
+      // Simple average: (existing average + new value) / 2
+      const currentAverage = user.latestBlinkCount || 0;
+      const newAverage = currentAverage === 0 ? newBlinkCount : (currentAverage + newBlinkCount) / 2;
+      
+      user.latestBlinkCount = Math.round(newAverage * 100) / 100; // Round to 2 decimal places
+      user.updatedAt = new Date();
+
+      await user.save();
+      console.log(`User ${userId} blink count updated: ${currentAverage} -> ${user.latestBlinkCount}`);
+      return user;
+    } catch (error) {
+      console.error('Error updating user blink count:', error);
+      throw error;
+    }
+  }
 }

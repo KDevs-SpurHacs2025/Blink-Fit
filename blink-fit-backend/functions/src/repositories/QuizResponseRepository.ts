@@ -142,4 +142,65 @@ export class QuizResponseRepository {
       throw error;
     }
   }
+
+  /**
+   * Save a comprehensive quiz response with analysis and LLM results
+   */
+  async saveQuizResponse(data: {
+    userId: string;
+    responses: Array<{
+      questionId: number;
+      question: string;
+      answer: string;
+      level: number;
+    }>;
+    subjective: {
+      breakPreference: string;
+      favoriteSnack: string;
+      screenTimeGoal: number;
+      focusSessionLength: number;
+    };
+    analysisResults: any;
+    llmResponse: any;
+    source: string;
+  }): Promise<IQuizResponse> {
+    try {
+      const sessionId = uuidv4();
+      
+      // Convert to the expected format
+      const responses: IQuizAnswer[] = data.responses.map(r => ({
+        questionId: r.questionId,
+        question: r.question,
+        answer: r.answer,
+        level: r.level
+      }));
+
+      const subjective: ISubjectiveData = {
+        screenTimeGoal: data.subjective.screenTimeGoal.toString(),
+        focusSessionLength: data.subjective.focusSessionLength.toString(),
+        breakPreference: data.subjective.breakPreference,
+        favoriteSnack: data.subjective.favoriteSnack
+      };
+
+      const quizResponse = new QuizResponse({
+        userId: data.userId,
+        sessionId,
+        responses,
+        subjective,
+        // Add additional fields for analysis and LLM response if needed
+        metadata: {
+          analysisResults: data.analysisResults,
+          llmResponse: data.llmResponse,
+          source: data.source
+        }
+      });
+
+      await quizResponse.save();
+      console.log(`Comprehensive quiz response saved for user ${data.userId} with session ${sessionId}`);
+      return quizResponse;
+    } catch (error) {
+      console.error('Error saving comprehensive quiz response:', error);
+      throw error;
+    }
+  }
 }

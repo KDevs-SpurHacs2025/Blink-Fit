@@ -48,13 +48,15 @@ export interface NewQuizResponse {
 // Type definitions for the application
 
 export interface QuizAnswer {
+  questionId: number;
   answer: string;
 }
 
 export interface SubjectiveData {
-  breakPreference?: string;
-  favoriteSnack?: string;
-  favoritePlace?: string;
+  breakPreference: string;
+  favoriteSnack: string;
+  focusSessionLength: string;
+  screenTimeGoal: string;
 }
 
 export interface GuideData {

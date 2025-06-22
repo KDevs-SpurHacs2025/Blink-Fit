@@ -142,6 +142,22 @@ Please provide safe and practical recommendations based on medical evidence. Inc
     }
   }
 
+  public async generate2020Guide(prompt: string, analysis: any): Promise<any> {
+    if (!this.isInitialized) {
+      throw new Error("Gemini service not initialized");
+    }
+
+    const response = await this.generateContent(prompt);
+    
+    // Try to parse JSON response
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    } else {
+      throw new Error("JSON format not found in Gemini response");
+    }
+  }
+
   public async generateExerciseGuide(userPreferences?: string[], currentBreakCount?: number, workDuration?: number): Promise<any> {
     const prompt = `
 You are Eye-Shield's friendly AI assistant. Please generate a personalized exercise guide suitable for the user's break time.

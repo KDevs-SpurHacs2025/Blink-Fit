@@ -20,4 +20,5 @@ app.listen(port, () => {
   console.log(`   POST http://localhost:${port}/api/hello`);
   console.log(`   POST http://localhost:${port}/api/generate-guide`);
   console.log(`   POST http://localhost:${port}/api/exercise-guidance`);
+  console.log(`   POST http://localhost:${port}/api/blink-count`);
 });
