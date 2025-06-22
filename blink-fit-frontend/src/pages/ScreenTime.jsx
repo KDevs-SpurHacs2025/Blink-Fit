@@ -108,6 +108,13 @@ export default function ScreenTime() {
     return `${m}:${s}`;
   };
 
+  const formatHMS = (sec) => {
+    const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+    const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${h}:${m}:${s}`;
+  };
+
   // 디버깅: secondsLeft, startMinutes, selectedRoutine 확인
   // console.log("[ScreenTime] secondsLeft:", secondsLeft, "startMinutes:", startMinutes, "selectedRoutine:", selectedRoutine);
 
@@ -161,7 +168,7 @@ export default function ScreenTime() {
                 className="w-4 h-4 mb-2"
               />
               <div className="text-xs font-bold text-black text-center w-full">
-                {Number(screenTimeGoal)}h
+                {formatHMS(totalScreenTimeStore)}
               </div>
               <div className="text-[0.625rem] text-gray-500 whitespace-nowrap w-full text-center">
                 Total Screen Time
