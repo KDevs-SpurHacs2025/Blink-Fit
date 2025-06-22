@@ -42,6 +42,15 @@ const useUserStore = create((set) => ({
       totalBreakTime: 0,
       oneMoreHourUsed: false,
     }),
+  resetTimes: () =>
+    set({
+      totalScreenTime: 0,
+      totalBreakTime: 0,
+      screenTimeCount: 0,
+      breakTimeCount: 0,
+      breakCompletionCount: 0,
+      oneMoreHourUsed: false,
+    }),
 }));
 
 export default useUserStore;

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function Summary() {
   const totalScreenTime = useUserStore((state) => state.totalScreenTime);
   const totalBreakTime = useUserStore((state) => state.totalBreakTime); // 추가
-  const resetUser = useUserStore((state) => state.resetUser);
+  const resetTimes = useUserStore((state) => state.resetTimes);
   const navigate = useNavigate();
   // 시간 포맷 hh:mm:ss
   const formatTime = (sec) => {
@@ -61,7 +61,7 @@ export default function Summary() {
           if (window.trackerWindow && !window.trackerWindow.closed) {
             window.trackerWindow.close();
           }
-          resetUser();
+          resetTimes();
           navigate("/home");
         }}
       >
