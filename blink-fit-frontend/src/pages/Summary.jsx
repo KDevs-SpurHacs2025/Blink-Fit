@@ -16,14 +16,14 @@ export default function Summary() {
   const setTestData = () => {
     const setTotalScreenTime = useUserStore.getState().setTotalScreenTime;
     const setTotalBreakTime = useUserStore.getState().setTotalBreakTime;
-    
+
     // Set test values (2 hours screen time, 30 minutes break time)
     setTotalScreenTime(7200); // 2 hours in seconds
-    setTotalBreakTime(1800);  // 30 minutes in seconds
-    
-    console.log('🧪 Test data set:', {
-      screenTime: '2 hours',
-      breakTime: '30 minutes'
+    setTotalBreakTime(1800); // 30 minutes in seconds
+
+    console.log("🧪 Test data set:", {
+      screenTime: "2 hours",
+      breakTime: "30 minutes",
     });
   };
 
@@ -46,40 +46,48 @@ export default function Summary() {
       }
 
       // Convert time to hours (seconds → hours)
-      const screenTimeHours = totalScreenTime ;
-      const breakTimeHours = totalBreakTime ;
+      const screenTimeHours = totalScreenTime;
+      const breakTimeHours = totalBreakTime;
 
-      console.log('Sending session summary:', {
+      console.log("Sending session summary:", {
         userId,
         totalScreenTime: screenTimeHours,
-        totalBreakTime: breakTimeHours
+        totalBreakTime: breakTimeHours,
       });
 
-      const response = await fetch('https://api-lcq5pbmy4q-pd.a.run.app/summary', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: userId,
-          sessionSummary: {
-            totalScreenTime: screenTimeHours,
-            totalBreakTime: breakTimeHours
-          }
-        })
-      });
+      const response = await fetch(
+        "https://api-lcq5pbmy4q-pd.a.run.app/summary",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            sessionSummary: {
+              totalScreenTime: screenTimeHours,
+              totalBreakTime: breakTimeHours,
+              breakCompletionRate: Number(breakCompletionRate),
+            },
+          }),
+        }
+      );
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Session summary sent successfully:', result);
+        console.log("Session summary sent successfully:", result);
         return true;
       } else {
         const errorText = await response.text();
-        console.error('Failed to send session summary:', response.status, errorText);
+        console.error(
+          "Failed to send session summary:",
+          response.status,
+          errorText
+        );
         return false;
       }
     } catch (error) {
-      console.error('Error sending session summary:', error);
+      console.error("Error sending session summary:", error);
       return false;
     }
   };
@@ -91,6 +99,16 @@ export default function Summary() {
     const s = String(sec % 60).padStart(2, "0");
     return `${h}:${m}:${s}`;
   };
+
+  const breakTimeCount = useUserStore((state) => state.breakTimeCount);
+  const breakCompletionCount = useUserStore(
+    (state) => state.breakCompletionCount
+  );
+  // Break Completion Rate 계산 (소수점 한자리까지)
+  const breakCompletionRate =
+    breakTimeCount > 0
+      ? ((breakCompletionCount / breakTimeCount) * 100).toFixed(1)
+      : "0.0";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
@@ -128,9 +146,9 @@ export default function Summary() {
           </div>
         </div>
       </div>
-      
+
       {/* TEST: Development testing button */}
-      {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === "development" && (
         <button
           className="mt-4 w-full max-w-md py-2 bg-blue-400 text-white rounded-lg font-semibold text-sm hover:bg-blue-500 transition"
           onClick={setTestData}
@@ -138,36 +156,36 @@ export default function Summary() {
           🧪 Set Test Data (Dev Only)
         </button>
       )}
-      
+
       <button
         className={`mt-10 w-full max-w-md py-3 text-white rounded-lg font-semibold text-lg transition ${
-          isSubmitting 
-            ? 'bg-gray-400 cursor-not-allowed' 
-            : 'bg-green-400 hover:bg-green-500'
+          isSubmitting
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-green-400 hover:bg-green-500"
         }`}
         onClick={async () => {
           if (isSubmitting) return;
-          
+
           setIsSubmitting(true);
-          
+
           try {
             // Call Summary API
             const success = await submitSessionSummary();
-            
+
             if (success) {
-              console.log('Session summary submitted successfully');
+              console.log("Session summary submitted successfully");
             } else {
-              console.error('Failed to submit session summary');
+              console.error("Failed to submit session summary");
               // Continue even if failed (for offline cases)
             }
           } catch (error) {
-            console.error('Error during summary submission:', error);
+            console.error("Error during summary submission:", error);
           } finally {
             // Try to close tracker.html window
             if (window.trackerWindow && !window.trackerWindow.closed) {
               window.trackerWindow.close();
             }
-            
+
             // Reset state and navigate to home
             resetTimes();
             navigate("/home");
@@ -175,7 +193,7 @@ export default function Summary() {
         }}
         disabled={isSubmitting}
       >
-        {isSubmitting ? 'Saving...' : 'Done'}
+        {isSubmitting ? "Saving..." : "Done"}
       </button>
     </div>
   );

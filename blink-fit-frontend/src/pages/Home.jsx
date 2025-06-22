@@ -173,7 +173,12 @@ const Home = () => {
               Break Completion Rate
             </div>
             <div className="text-4xl font-bold mb-3">
-              {breakTimeCount > 0 ? `${breakCompletionRate}%` : "-"}
+              {apiData?.breakCompletionRate !== undefined &&
+              apiData?.breakCompletionRate !== null
+                ? `${apiData.breakCompletionRate}%`
+                : breakTimeCount > 0
+                ? `${breakCompletionRate}%`
+                : "-"}
             </div>
             <div className="text-sm text-black">
               {breakTimeCount > 0
