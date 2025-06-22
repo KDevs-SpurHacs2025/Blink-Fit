@@ -100,7 +100,7 @@ export const generateGuide = async (req: Request, res: Response): Promise<void> 
           console.error("Failed to update user behavior data:", dbError);
         }
         
-        return res.json({
+        res.json({
           message: "Quiz submitted and AI-based guide generated successfully",
           guide: guideData,
           timestamp: new Date().toISOString(),
