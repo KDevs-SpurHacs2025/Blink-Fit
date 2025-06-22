@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/authApi";
 import useUserStore from "../store/userStore";
 import PrimaryButton from "../components/PrimaryButton";
 
@@ -9,9 +10,24 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    setUser({ id: email, pwd: password });
-    navigate("/survey");
+  const handleLogin = async () => {
+    try {
+      const data = await loginUser(email, password);
+      setUser({
+        id: data.userId,
+        username: data.username,
+        survey: data.isSurvey,
+      });
+
+      if (data.isSurvey) {
+        navigate("/survey");
+      } else {
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+      // Handle login failure (e.g., show an error message to the user)
+    }
   };
 
   const handleGuest = () => {
@@ -54,13 +70,6 @@ export default function Login() {
             </a>
           </span>
         </div>
-        {/* <div className="w-full border-b border-gray-200 my-9"></div>
-        <PrimaryButton
-          onClick={handleGuest}
-          className="bg-white text-black border border-primary hover:bg-primary transition"
-        >
-          Enter as guest
-        </PrimaryButton> */}
       </div>
     </div>
   );
