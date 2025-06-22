@@ -165,8 +165,6 @@ export class QuizResponseRepository {
     source: string;
   }): Promise<IQuizResponse> {
     try {
-      const sessionId = uuidv4();
-      
       // Convert to the expected format
       const responses: IQuizAnswer[] = data.responses.map(r => ({
         questionId: r.questionId,
@@ -182,24 +180,35 @@ export class QuizResponseRepository {
         favoriteSnack: data.subjective.favoriteSnack
       };
 
-      const quizResponse = new QuizResponse({
-        userId: data.userId,
-        sessionId,
-        responses,
-        subjective,
-        // Add additional fields for analysis and LLM response if needed
-        metadata: {
-          analysisResults: data.analysisResults,
-          llmResponse: data.llmResponse,
-          source: data.source
-        }
-      });
+      // Check if quiz response already exists for this user
+      const existingQuizResponse = await QuizResponse.findOne({ userId: data.userId });
 
-      await quizResponse.save();
-      console.log(`Comprehensive quiz response saved for user ${data.userId} with session ${sessionId}`);
-      return quizResponse;
+      if (existingQuizResponse) {
+        // Update existing quiz response
+        existingQuizResponse.responses = responses;
+        existingQuizResponse.subjective = subjective;
+        existingQuizResponse.submittedAt = new Date();
+
+        await existingQuizResponse.save();
+        console.log(`Quiz response updated for user ${data.userId} with session ${existingQuizResponse.sessionId}`);
+        return existingQuizResponse;
+      } else {
+        // Create new quiz response
+        const sessionId = uuidv4();
+        
+        const quizResponse = new QuizResponse({
+          userId: data.userId,
+          sessionId,
+          responses,
+          subjective
+        });
+
+        await quizResponse.save();
+        console.log(`New quiz response created for user ${data.userId} with session ${sessionId}`);
+        return quizResponse;
+      }
     } catch (error) {
-      console.error('Error saving comprehensive quiz response:', error);
+      console.error('Error saving quiz response:', error);
       throw error;
     }
   }

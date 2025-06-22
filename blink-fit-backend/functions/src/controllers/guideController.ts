@@ -6,6 +6,7 @@ import { GuideRequest } from "../types";
 import { connectDB } from "../config/database";
 import { UserRepository } from "../repositories/UserRepository";
 import { QuizResponseRepository } from "../repositories/QuizResponseRepository";
+import mongoose from "mongoose";
 
 const geminiService = GeminiService.getInstance();
 const userRepository = new UserRepository();
@@ -29,15 +30,33 @@ export const generateGuide = async (req: Request, res: Response) => {
       });
     }
 
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        error: "Invalid userId format. Must be a valid ObjectId."
+      });
+    }
+
     // Database connection
     await connectDB();
 
-    // Get user profile (check existing eye health status)
+    // Get user profile by ObjectId and extract username
     let userProfile = null;
+    let username = null;
     try {
-      userProfile = await userRepository.findByUsername(userId);
+      userProfile = await userRepository.findById(userId);
+      if (!userProfile) {
+        return res.status(404).json({
+          error: "User not found with the provided userId."
+        });
+      }
+      username = userProfile.username;
+      logger.info(`Found user: ${username} for ObjectId: ${userId}`);
     } catch (error) {
-      logger.warn(`User profile not found for ${userId}, proceeding with quiz data only`);
+      logger.error(`Failed to find user with ObjectId ${userId}:`, error);
+      return res.status(500).json({
+        error: "Failed to retrieve user information."
+      });
     }
 
     // 20-20-20 rule based eye health analysis
@@ -74,10 +93,10 @@ export const generateGuide = async (req: Request, res: Response) => {
       source = "Enhanced 20-20-20 Fallback Algorithm (Gemini disabled)";
     }
 
-    // Save quiz response to database
+    // Save quiz response to database (using username for quiz_responses collection)
     try {
       await quizRepository.saveQuizResponse({
-        userId,
+        userId: username, // Use username instead of ObjectId for quiz_responses
         responses: quiz.map((q) => ({
           questionId: q.questionId,
           question: `Question ${q.questionId}`,
@@ -94,21 +113,23 @@ export const generateGuide = async (req: Request, res: Response) => {
         llmResponse: guideData,
         source
       });
+      logger.info(`Quiz response saved for user ${username} (ObjectId: ${userId})`);
     } catch (dbError) {
       logger.error("Failed to save quiz response to database:", dbError);
       // Continue execution - don't fail the API if DB save fails
     }
 
-    // Update user profile (reflect eye health status)
+    // Update user profile with quiz subjective data
     try {
       if (userProfile) {
         await userRepository.updateUserFromQuiz(
-          userId,
-          subjective?.breakPreference,
-          subjective?.favoriteSnack,
-          eyeHealthAnalysis.recommendedScreenTime,
-          eyeHealthAnalysis.recommendedFocusSession
+          username, // Use username instead of ObjectId
+          subjective?.breakPreference, // breakPreference → hobbies (via preferences.breakVibe)
+          subjective?.favoriteSnack,   // favoriteSnack → preferences.favoriteSnack
+          parseInt(subjective?.screenTimeGoal || "0") || undefined, // screenTimeGoal → screenTimeGoalHours
+          parseInt(subjective?.focusSessionLength || "0") || undefined // focusSessionLength → focusSessionLengthMinutes
         );
+        logger.info(`User profile updated for ${username} (ObjectId: ${userId}) with quiz data`);
       }
     } catch (updateError) {
       logger.error("Failed to update user profile:", updateError);

@@ -219,6 +219,11 @@ export class UserRepository {
       
       if (breakPreference) {
         preferences.breakVibe = breakPreference;
+        // Also add to hobbies array (breakPreference → hobbies mapping)
+        const currentHobbies = user.hobbies || [];
+        if (!currentHobbies.includes(breakPreference)) {
+          user.hobbies = [...currentHobbies, breakPreference];
+        }
       }
       
       if (favoriteSnack) {
@@ -341,6 +346,19 @@ export class UserRepository {
     } catch (error) {
       console.error('Error checking quiz responses:', error);
       return false;
+    }
+  }
+
+  /**
+   * Find user by ObjectId
+   */
+  async findById(userId: string): Promise<IUserProfile | null> {
+    try {
+      const user = await UserProfile.findById(userId);
+      return user;
+    } catch (error) {
+      console.error('Error finding user by ID:', error);
+      throw error;
     }
   }
 }
