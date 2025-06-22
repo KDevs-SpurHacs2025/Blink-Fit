@@ -36,7 +36,13 @@ const Home = () => {
 
   // user 정보 chrome.storage.local에 동기화
   React.useEffect(() => {
-    if (user && user.id && window.chrome && chrome.storage && chrome.storage.local) {
+    if (
+      user &&
+      user.id &&
+      window.chrome &&
+      chrome.storage &&
+      chrome.storage.local
+    ) {
       chrome.storage.local.set({ user });
       console.log("user info synced to chrome.storage.local (Home):", user);
     }
@@ -163,16 +169,20 @@ const Home = () => {
               Your average blinks
             </div>
             <div className="text-4xl font-bold mb-3">
-              {apiData?.averageBlink ? `${apiData.averageBlink}/min` : "12/min"}
+              {apiData?.averageBlink
+                ? `${Number(apiData.averageBlink).toFixed(1)}/min`
+                : "12.0/min"}
             </div>
             <div className="text-sm text-black">
               {apiData?.averageBlink ? (
                 <>
-                  <span className="font-bold">{15 - apiData.averageBlink}</span>{" "}
+                  <span className="font-bold">
+                    {(15 - Number(apiData.averageBlink)).toFixed(1)}
+                  </span>{" "}
                   below healthy average (15-20/min)
                 </>
               ) : (
-                "3 below healthy average (15-20/min)"
+                "3.0 below healthy average (15-20/min)"
               )}
             </div>
           </div>
@@ -191,7 +201,13 @@ const Home = () => {
             </div>
             <div className="text-sm text-black">
               {breakTimeCount > 0
-                ? "Try to take more breaks 🧘"
+                ? (apiData?.breakCompletionRate !== undefined &&
+                    apiData?.breakCompletionRate !== null &&
+                    Number(apiData.breakCompletionRate) === 0) ||
+                  (apiData?.breakCompletionRate === undefined &&
+                    breakCompletionRate === 0)
+                  ? "Try to take more breaks 😭"
+                  : "Try to take more breaks 🧘"
                 : "Not enough routine data 😢"}
             </div>
           </div>

@@ -11,7 +11,6 @@ import ConfirmModal from "../components/ConfirmModal";
 import { FlagIcon } from "@heroicons/react/24/outline";
 
 export default function ScreenTime() {
-  const [status, setStatus] = useState("Danger");
   const [blinkCount, setBlinkCount] = useState(0);
   const [totalScreenTime, setTotalScreenTime] = useState(2);
   const [distance, setDistance] = useState(130);
@@ -26,6 +25,8 @@ export default function ScreenTime() {
   const screenTimeGoal = useUserStore((state) => state.screenTimeGoal);
   const oneMoreHourUsed = useUserStore((state) => state.oneMoreHourUsed);
   const setOneMoreHourUsed = useUserStore((state) => state.setOneMoreHourUsed);
+  const status = useUserStore((state) => state.status);
+  const setStatus = useUserStore((state) => state.setStatus);
 
   const [oneMoreHourStart, setOneMoreHourStart] = useState(null);
 
@@ -152,7 +153,10 @@ export default function ScreenTime() {
   // 실시간 blinkCount 업데이트: background/content script에서 메시지 수신
   useEffect(() => {
     function handleBlinkMessage(message) {
-      if (message.type === "BLINK_COUNT_UPDATE" && typeof message.blinkCount === "number") {
+      if (
+        message.type === "BLINK_COUNT_UPDATE" &&
+        typeof message.blinkCount === "number"
+      ) {
         setBlinkCount(message.blinkCount);
       }
     }
@@ -161,6 +165,27 @@ export default function ScreenTime() {
       return () => chrome.runtime.onMessage.removeListener(handleBlinkMessage);
     }
   }, []);
+
+  // Blink Count에 따라 status 자동 변경
+  useEffect(() => {
+    if (blinkCount < 15) {
+      setStatus("Danger");
+    } else {
+      setStatus("Normal");
+    }
+    // Warning 조건이 필요하면 else if로 추가 가능
+  }, [blinkCount, setStatus]);
+
+  // status에 따라 statusColor 자동 변경
+  useEffect(() => {
+    if (status === "Danger") {
+      setStatusColor("bg-orange-400");
+    } else if (status === "Warning") {
+      setStatusColor("bg-yellow-400");
+    } else if (status === "Normal") {
+      setStatusColor("bg-green-400");
+    }
+  }, [status]);
 
   return (
     <>
@@ -249,7 +274,8 @@ export default function ScreenTime() {
           <div className="text-center mb-2">
             <div className="text-xs text-[#626262]">Status: {status}</div>
             <div className="text-sm text-black mt-1 whitespace-nowrap">
-              Please blink at least <a className="font-medium">{blinkCount}</a>{" "}
+              Please blink at least{" "}
+              <a className="font-medium">{Math.max(15 - blinkCount, 0)}</a> more
               times
               {/* Maintain a distance of at least {distance} cm from the screen. */}
             </div>
