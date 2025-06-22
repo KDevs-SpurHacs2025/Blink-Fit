@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
+import useUserStore from "../store/userStore";
+import ConfirmModal from "../components/ConfirmModal";
 import PrimaryButton from "../components/PrimaryButton";
 
 const choiceQuestions = questions.filter((q) => q.type === "choice");
@@ -57,6 +59,7 @@ export default function Survey() {
 
   const handleSave = () => {
     const apiPayload = buildApiPayload();
+    console.log("[Survey] 실제 서버 전송 payload:", apiPayload);
     setSurveyAnswers(answers);
     setModalPayload(apiPayload);
     setShowModal(true);
@@ -123,6 +126,14 @@ export default function Survey() {
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-color overflow-hidden">
+      {showModal && (
+        <ConfirmModal
+          title="Confirm Your Answers"
+          message={renderModalContent()}
+          onConfirm={handleModalConfirm}
+          onCancel={handleModalCancel}
+        />
+      )}
       <div className="w-3/4 h-full flex flex-col items-center">
         {/* Progress bar */}
         <div className="w-3/4 h-2 bg-[#D9D9D9] rounded-full mt-10 mb-12">
@@ -148,7 +159,9 @@ export default function Survey() {
                 </h2>
                 {choiceQuestions.map((q) => (
                   <div key={q.name} className="w-full mb-10">
-                    <p className="text-medium mb-2">{q.question}</p>
+                    <div className="text-medium font-medium mb-2">
+                      {q.question}
+                    </div>
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label
@@ -159,8 +172,10 @@ export default function Survey() {
                             type="radio"
                             name={q.name}
                             className="form-radio"
-                            checked={answers[q.name] === option}
-                            onChange={() => handleInput(q.name, option)}
+                            checked={answers[q.name] === option.text}
+                            onChange={() =>
+                              handleInput(q.name, option.text, "choice")
+                            }
                           />
                           <span className="text-sm">{option.text}</span>
                         </label>
@@ -189,7 +204,7 @@ export default function Survey() {
                 </h2>
                 {inputQuestions.map((q) => (
                   <div key={q.name} className="mb-6">
-                    <label className="block mb-2 text-medium font-base">
+                    <label className="block mb-2 text-medium font-medium">
                       {q.question}
                     </label>
                     <input
@@ -204,11 +219,7 @@ export default function Survey() {
                     />
                   </div>
                 ))}
-                <PrimaryButton
-                  onClick={handleSave}
-                  disabled={!allInputsFilled}
-                  className="mt-8"
-                >
+                <PrimaryButton onClick={handleSave} disabled={!allInputsFilled}>
                   Save
                 </PrimaryButton>
               </motion.div>
