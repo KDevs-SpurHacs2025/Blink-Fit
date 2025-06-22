@@ -40,7 +40,7 @@ export const generateGuide = async (req: Request, res: Response) => {
     const quizForDB: IQuizAnswer[] = quiz.map(q => ({
       questionId: q.questionId || 1,
       answer: q.answer,
-      level: q.level || 0
+      level: 0 // Level not needed for LLM processing
     }));
 
     // Save quiz response to MongoDB (only if subjective data exists)

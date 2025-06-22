@@ -181,7 +181,7 @@ export function createApiResponse<T>(
 }
 
 /**
- * Validate quiz data (new API format)
+ * Validate quiz data (simplified format - no level calculation needed)
  */
 export function validateQuizData(userId: string, quiz: any[]): { isValid: boolean; error?: string } {
   if (!userId) {
@@ -199,17 +199,13 @@ export function validateQuizData(userId: string, quiz: any[]): { isValid: boolea
   for (let i = 0; i < quiz.length; i++) {
     const item = quiz[i];
     
-    // Validate required fields for new API format
+    // Validate required fields
     if (!item.hasOwnProperty('answer')) {
       return { isValid: false, error: `quiz[${i}] must have 'answer' property` };
     }
     
-    if (!item.hasOwnProperty('level')) {
-      return { isValid: false, error: `quiz[${i}] must have 'level' property` };
-    }
-    
-    if (typeof item.level !== 'number' || item.level < 0 || item.level > 2) {
-      return { isValid: false, error: `quiz[${i}].level must be a number between 0 and 2` };
+    if (typeof item.answer !== 'string' || item.answer.trim() === '') {
+      return { isValid: false, error: `quiz[${i}].answer must be a non-empty string` };
     }
     
     // Set questionId if not provided
@@ -220,3 +216,5 @@ export function validateQuizData(userId: string, quiz: any[]): { isValid: boolea
   
   return { isValid: true };
 }
+
+
