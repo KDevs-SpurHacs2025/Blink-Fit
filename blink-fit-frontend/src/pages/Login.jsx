@@ -24,6 +24,15 @@ export default function Login() {
         username: responseData.data.username,
         survey: responseData.data.isSurvey,
       });
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: responseData.data.userId,
+          email: email,
+          username: responseData.data.username,
+          survey: responseData.data.isSurvey,
+        })
+      );
 
       // Redirect based on survey status
       if (responseData.data.isSurvey) {
