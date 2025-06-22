@@ -55,8 +55,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await userRepository.authenticateUserByEmail(email.trim(), password);
     
     if (user) {
-      // Check if user has completed any quiz responses
-      const hasQuiz = await userRepository.hasQuizResponses(user._id.toString());
+      // Check if user has completed any quiz responses (using username)
+      const hasQuiz = await userRepository.hasQuizResponses(user.username);
       
       // Login successful
       res.json(createApiResponse(

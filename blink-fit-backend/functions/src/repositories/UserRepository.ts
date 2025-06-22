@@ -66,7 +66,14 @@ export class UserRepository {
    */
   async authenticateUserByEmail(email: string, password: string): Promise<IUserProfile | null> {
     try {
-      const user = await UserProfile.findOne({ username: email }); // Using username field for email
+      // First try to find by email field
+      let user = await UserProfile.findOne({ email: email });
+      
+      // If not found, try to find by username field (for backward compatibility)
+      if (!user) {
+        user = await UserProfile.findOne({ username: email });
+      }
+      
       if (!user) {
         return null;
       }
@@ -323,11 +330,13 @@ export class UserRepository {
 
   /**
    * Check if user has completed any quiz responses
+   * Note: quiz_responses collection uses username as userId, not ObjectId
    */
-  async hasQuizResponses(userId: string): Promise<boolean> {
+  async hasQuizResponses(username: string): Promise<boolean> {
     try {
       const QuizResponse = require('../models/QuizResponse').default;
-      const quizCount = await QuizResponse.countDocuments({ userId });
+      const quizCount = await QuizResponse.countDocuments({ userId: username });
+      console.log(`Checking quiz responses for username: ${username}, count: ${quizCount}`);
       return quizCount > 0;
     } catch (error) {
       console.error('Error checking quiz responses:', error);
