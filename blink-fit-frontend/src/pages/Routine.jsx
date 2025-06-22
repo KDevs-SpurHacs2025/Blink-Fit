@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../components/PrimaryButton";
 import RoutineCard from "../components/RoutineCard";
@@ -17,6 +17,15 @@ export default function Routine() {
   const setSelectedRoutine = useUserStore((state) => state.setSelectedRoutine);
   const screenTime = Number(surveyAnswers?.focusSessionLength) || 1;
   const breakTime = Math.round(screenTime * 0.2) || 1;
+
+  // 마운트 시 micro routine을 기본 선택
+  useEffect(() => {
+    setSelectedRoutine({
+      type: "micro",
+      screen: microRoutine.screen,
+      break: microRoutine.break,
+    });
+  }, [setSelectedRoutine, microRoutine.screen, microRoutine.break]);
 
   // 루틴 선택 핸들러
   const handleSelectMicro = () => {

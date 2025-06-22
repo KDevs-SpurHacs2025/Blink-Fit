@@ -10,7 +10,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
   return (
-    <div className="w-full h-full flex flex-col items-center min-h-screen bg-bg-color py-[80px] relative">
+    <div className="w-full h-full flex flex-col items-center min-h-screen bg-bg-color py-[80px] relative text-black">
       {/* Profile Picture */}
       <div className="w-[160px] h-[160px] rounded-full bg-gray-200 flex items-center justify-center mb-6">
         {/* Placeholder for profile image */}

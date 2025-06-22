@@ -51,6 +51,20 @@ const useUserStore = create((set) => ({
       breakCompletionCount: 0,
       oneMoreHourUsed: false,
     }),
+  resetSurveyAndRoutine: () =>
+    set((state) => ({
+      surveyAnswers: {},
+      selectedRoutine: null,
+      screenTimeGoal: 0,
+      screenTimeCount: 0,
+      breakTimeCount: 0,
+      breakCompletionCount: 0,
+      totalScreenTime: 0,
+      totalBreakTime: 0,
+      oneMoreHourUsed: false,
+      // user 정보(state.user)는 그대로 유지
+      user: state.user,
+    })),
 }));
 
 export default useUserStore;
