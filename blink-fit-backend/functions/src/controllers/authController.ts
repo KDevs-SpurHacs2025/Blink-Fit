@@ -153,26 +153,55 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Calculate weekly trend (compare last 7 days vs previous 7 days)
-    const calculateWeeklyTrend = (recentTimes: number[]): number => {
-      if (recentTimes.length < 7) return 0;
+    // Calculate weekly trend using LLM analysis
+    const calculateWeeklyTrend = async (recentTimes: number[]): Promise<string> => {
+      if (recentTimes.length < 7) return "Not enough data for trend analysis";
       
-      // Get last 7 days average
-      const lastWeekAvg = recentTimes.slice(-7).reduce((sum, time) => sum + time, 0) / 7;
-      
-      // Get previous 7 days average (if available)
-      if (recentTimes.length >= 14) {
-        const prevWeekAvg = recentTimes.slice(-14, -7).reduce((sum, time) => sum + time, 0) / 7;
-        return Number((lastWeekAvg - prevWeekAvg).toFixed(1));
+      try {
+        // Import GeminiService
+        const GeminiService = (await import('../services/geminiService')).default;
+        const geminiService = GeminiService.getInstance();
+        
+        // Prepare trend analysis prompt
+        const trendPrompt = `
+Analyze the following 7-day screen time trend data (in minutes) and provide a brief trend summary:
+
+Screen time data (oldest to newest): [${recentTimes.slice(-7).join(', ')}]
+
+Respond with ONE clear sentence (10-15 words) describing the overall trend pattern.
+Examples: "Screen time shows increasing trend this week", "Usage decreasing after mid-week spike"
+        `;
+
+        const trendAnalysis = await geminiService.generateContent(trendPrompt);
+        return trendAnalysis?.trim() || "Trend analysis unavailable";
+        
+      } catch (error) {
+        console.log('LLM trend analysis failed, using fallback calculation');
+        
+        // Fallback: Simple numerical trend
+        const lastWeekAvg = recentTimes.slice(-7).reduce((sum, time) => sum + time, 0) / 7;
+        
+        if (recentTimes.length >= 14) {
+          const prevWeekAvg = recentTimes.slice(-14, -7).reduce((sum, time) => sum + time, 0) / 7;
+          const change = Number((lastWeekAvg - prevWeekAvg).toFixed(1));
+          
+          if (change > 10) return "Screen time shows significant increase this week";
+          if (change > 0) return "Screen time showing gradual increase";
+          if (change < -10) return "Screen time decreased significantly this week";
+          if (change < 0) return "Screen time showing gradual decrease";
+        }
+        
+        return "Screen time remains stable this week";
       }
-      
-      return 0; // Not enough data for comparison
     };
 
-    // Calculate average usage time (most recent entry)
+    // Calculate average usage time (actual average of recentScreenTimes)
     const averageUsageTime = user.recentScreenTimes && user.recentScreenTimes.length > 0 
-      ? user.recentScreenTimes[user.recentScreenTimes.length - 1] 
+      ? Number((user.recentScreenTimes.reduce((sum, time) => sum + time, 0) / user.recentScreenTimes.length).toFixed(1))
       : 0;
+
+    // Calculate weekly trend analysis
+    const weeklyTrend = await calculateWeeklyTrend(user.recentScreenTimes || []);
 
     // Build response data
     const userData = {
@@ -180,8 +209,9 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
       username: user.username,
       averageBlink: user.latestBlinkCount || 15,
       recentScreenTimes: user.recentScreenTimes || [],
+      recentBreakTimes: user.recentBreakTimes || [],
       averageUsageTime: averageUsageTime,
-      weeklyTrend: calculateWeeklyTrend(user.recentScreenTimes || []),
+      weeklyTrend: weeklyTrend,
       screenTimeGoal: user.screenTimeGoalHours || 8,
       focusSessionLength: user.focusSessionLengthMinutes || 60,
       hobbies: user.hobbies || []
