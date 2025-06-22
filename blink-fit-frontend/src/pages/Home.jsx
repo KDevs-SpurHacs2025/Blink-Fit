@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import useUserStore from "../store/userStore";
 
 const handleStartEyeTracking = () => {
   const trackerUrl = "/tracker.html"; // public 폴더 기준
@@ -32,6 +33,15 @@ const data = [
 
 const Home = () => {
   const navigate = useNavigate();
+  const user = useUserStore((state) => state.user);
+
+  React.useEffect(() => {
+    if (user && user.id && window.chrome && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ user });
+      console.log("user info synced to chrome.storage.local (Home):", user);
+    }
+  }, [user]);
+
   return (
     <div className="w-full h-full gap-6 flex flex-col items-center justify-center bg-bg-color">
       <div className="w-5/6 h-full pt-6 flex flex-col items-center justify-center ">
