@@ -8,6 +8,7 @@ import Stop from "../assets/icons/stop.svg";
 import Play from "../assets/icons/play.svg";
 import CircleTimer from "../components/CircleTimer";
 import ConfirmModal from "../components/ConfirmModal";
+import { FlagIcon } from "@heroicons/react/24/outline";
 
 export default function ScreenTime() {
   const [status, setStatus] = useState("Danger");
@@ -23,6 +24,10 @@ export default function ScreenTime() {
   const totalScreenTimeStore = useUserStore((state) => state.totalScreenTime);
   const surveyAnswers = useUserStore((state) => state.surveyAnswers);
   const screenTimeGoal = useUserStore((state) => state.screenTimeGoal);
+  const oneMoreHourUsed = useUserStore((state) => state.oneMoreHourUsed);
+  const setOneMoreHourUsed = useUserStore((state) => state.setOneMoreHourUsed);
+
+  const [oneMoreHourStart, setOneMoreHourStart] = useState(null);
 
   const startMinutes = Number(selectedRoutine?.screen);
   const [secondsLeft, setSecondsLeft] = useState(
@@ -91,14 +96,40 @@ export default function ScreenTime() {
 
   // 목표 화면 시간 초과 시 제한 페이지로 이동
   useEffect(() => {
-    // const screenTimeGoalHour = Number(surveyAnswers?.subjective?.screenTimeGoal);
-    // const screenTimeGoalSec = screenTimeGoalHour * 60 * 60;
-    const screenTimeGoalSec = 130; // 테스트용: 목표 시간 2분 10초(130초)로 고정
-
+    /*
+    // ====== 테스트용: 2분(120초) 넘으면 LIMIT으로 이동 ======
+    if (totalScreenTimeStore >= 120) {
+      navigate("/limit");
+      return;
+    }
+    */
+    // ====== 실제 로직 ======
+    let screenTimeGoalSec;
+    if (!oneMoreHourUsed) {
+      // 원래 목표 시간
+      const screenTimeGoalHour = Number(surveyAnswers?.screenTimeGoal);
+      screenTimeGoalSec = screenTimeGoalHour * 60 * 60;
+    } else {
+      // oneMoreHourUsed가 true면, 연장 시작 시점부터 1시간만 허용
+      if (oneMoreHourStart === null) {
+        setOneMoreHourStart(totalScreenTimeStore); // 연장 시작 시점 저장
+        return; // 다음 렌더에서 계산
+      }
+      screenTimeGoalSec = oneMoreHourStart + 60 * 60; // 1시간(3600초) 추가
+    }
     if (totalScreenTimeStore >= screenTimeGoalSec) {
+      setOneMoreHourStart(null); // 다시 초기화
+      setOneMoreHourUsed(false); // 연장권 사용 종료
       navigate("/limit");
     }
-  }, [totalScreenTimeStore, surveyAnswers, navigate]);
+  }, [
+    totalScreenTimeStore,
+    navigate,
+    surveyAnswers,
+    oneMoreHourUsed,
+    oneMoreHourStart,
+    setOneMoreHourUsed,
+  ]);
 
   // 시간 포맷 mm:ss
   const formatTime = (sec) => {
@@ -159,7 +190,22 @@ export default function ScreenTime() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 w-full mb-6">
+          <div className="grid grid-cols-3 gap-4 w-full mb-6">
+            {/* TargetTime */}
+            <div className="flex flex-col items-center bg-white rounded-lg shadow p-4">
+              <FlagIcon className="w-4 h-4 mb-2 text-gray-700" />
+              <div className="text-xs font-bold text-black text-center w-full">
+                {oneMoreHourUsed
+                  ? formatHMS(
+                      (oneMoreHourStart ?? totalScreenTimeStore) + 60 * 60
+                    )
+                  : formatHMS(Number(surveyAnswers?.screenTimeGoal) * 60 * 60)}
+              </div>
+              <div className="text-[0.625rem] text-gray-500 whitespace-nowrap w-full text-center">
+                Target Time
+              </div>
+            </div>
+
             {/* Total Screen Time */}
             <div className="flex flex-col items-center bg-white rounded-lg shadow p-4">
               <img
@@ -185,19 +231,6 @@ export default function ScreenTime() {
                 Blink Count
               </div>
             </div>
-
-            {/* Distance */}
-            {/*
-            <div className="flex flex-col items-center bg-white rounded-lg shadow p-4">
-              <img src={Rule} alt="Rule Icon" className="w-4 h-4 mb-2" />
-              <div className="text-xs font-bold text-black text-center w-full">
-                {distance} cm
-              </div>
-              <div className="text-[0.625rem] text-gray-500 whitespace-nowrap w-full text-center">
-                Distance
-              </div>
-            </div>
-            */}
           </div>
 
           <div className="text-center mb-2">

@@ -5,7 +5,11 @@ import PrimaryButton from "../components/PrimaryButton";
 
 const handleStartEyeTracking = () => {
   const trackerUrl = "/tracker.html"; // public 폴더 기준
-  window.open(trackerUrl, "_blank", "width=800,height=600");
+  window.trackerWindow = window.open(
+    trackerUrl,
+    "_blank",
+    "width=800,height=600"
+  );
 };
 
 const Home = () => {

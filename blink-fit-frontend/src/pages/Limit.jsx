@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 export default function Limit() {
   const totalScreenTime = useUserStore((state) => state.totalScreenTime);
   const surveyAnswers = useUserStore((state) => state.surveyAnswers);
+  const incrementScreenTimeGoal = useUserStore(
+    (state) => state.incrementScreenTimeGoal
+  );
+  const setOneMoreHourUsed = useUserStore((state) => state.setOneMoreHourUsed);
   const navigate = useNavigate();
   // 목표 시간(초)
   const screenTimeGoalHour = Number(surveyAnswers?.screenTimeGoal);
@@ -43,15 +47,18 @@ export default function Limit() {
         <div className="flex gap-4 w-full justify-center">
           <button
             className="flex-1 border bg-gray-500 text-white border-green-600 font-medium py-2 rounded-lg transition hover:bg-green-50 focus:outline-none"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              setOneMoreHourUsed(true);
+              navigate("/screen-time");
+            }}
           >
-            Resume Timer
+            ⏰ One More Hour!
           </button>
           <button
             className="flex-1 border bg-green-500 border-green-600 text-green-700 font-medium py-2 rounded-lg transition hover:bg-green-50 focus:outline-none"
             onClick={() => navigate("/summary")}
           >
-            End for Today
+            🎉 End for Today
           </button>
         </div>
       </div>
