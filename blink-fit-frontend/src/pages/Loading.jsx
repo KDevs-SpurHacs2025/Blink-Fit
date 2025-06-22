@@ -9,24 +9,24 @@ export default function Loading() {
 
   // Get props from location.state or use defaults
   const {
-    title = "Let’s understand your screen habits and eye health to personalize your experience",
-    buttonText = "Continue",
+    title = null,
+    buttonText = "Continue >",
     next = "/survey",
-    subText = null,
+    subText = "Let’s understand your screen habits and eye health to personalize your experience",
   } = location.state || {};
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowButton(true), 2000);
+    const timer = setTimeout(() => setShowButton(true), 1200);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-color">
       <motion.div
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-2xl text-center font-medium text-black mb-4 w-3/4"
+        transition={{ duration: 1, ease: "easeOut" }}
+        className=" w-3/4 text-xl text-center font-bold text-black mb-4"
       >
         {title}
       </motion.div>
@@ -34,8 +34,8 @@ export default function Loading() {
         <motion.div
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="text-lg text-center text-gray-700 mb-8 w-3/4"
+          transition={{ duration: 0.8, delay: 0, ease: "easeOut" }}
+          className="w-3/4 text-xl text-center font-medium text-black mb-3"
         >
           {subText}
         </motion.div>
@@ -43,8 +43,8 @@ export default function Loading() {
       <motion.button
         initial={false}
         animate={{ opacity: showButton ? 1 : 0 }}
-        transition={{ duration: 0.7 }}
-        className="bg-green-500 text-white py-3 px-8 rounded-xl mt-4 text-lg hover:bg-green-600 transition"
+        transition={{ duration: 0.5 }}
+        className="bg-transparent text-black text-md hover:underline transition focus:outline-none border-none"
         onClick={() => navigate(next)}
         style={{ pointerEvents: showButton ? "auto" : "none" }}
       >

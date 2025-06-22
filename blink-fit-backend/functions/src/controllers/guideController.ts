@@ -15,22 +15,23 @@ const quizRepository = new QuizResponseRepository();
 /**
  * POST /api/generate-guide - Generate personalized eye health guide
  */
-export const generateGuide = async (req: Request, res: Response) => {
+export const generateGuide = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log("Guide generation API called");
     
     const { userId, quiz, subjective }: GuideRequest = req.body;
     
-    // Input validation
+    // Validate input data
     const validation = validateQuizData(userId, quiz);
     if (!validation.isValid) {
-      return res.status(400).json(createApiResponse(
+      res.status(400).json(createApiResponse(
         false,
         validation.error,
         undefined,
         undefined,
         validation.error
       ));
+      return; // Explicitly return after sending response
     }
 
     // Ensure database connection
@@ -80,6 +81,7 @@ export const generateGuide = async (req: Request, res: Response) => {
     }
 
     // Initialize Gemini if not already done
+
     if (!geminiService.isAvailable()) {
       geminiService.initialize();
     }
@@ -104,40 +106,44 @@ export const generateGuide = async (req: Request, res: Response) => {
           timestamp: new Date().toISOString(),
           source: "Gemini AI"
         });
+        return; // Explicitly return after sending response
       } catch (parseError) {
         console.error("Gemini guide generation failed:", parseError);
         
         // Fallback: Generate default guide
         const fallbackGuide = generateFallbackGuide(quiz, subjective);
         
-        return res.json({
+        res.json({
           message: "Quiz submitted and AI-based guide generated successfully",
           guide: fallbackGuide,
           timestamp: new Date().toISOString(),
           source: "Fallback Algorithm"
         });
+        return; // Explicitly return after sending response
       }
     } else {
       // Fallback when Gemini is disabled
       const fallbackGuide = generateFallbackGuide(quiz, subjective);
       
-      return res.json({
+      res.json({
         message: "Quiz submitted and AI-based guide generated successfully",
         guide: fallbackGuide,
         timestamp: new Date().toISOString(),
         source: "Fallback Algorithm (Gemini disabled)"
       });
+      return; // Explicitly return after sending response
     }
     
   } catch (error) {
     logger.error("Guide generation API error:", error);
     
-    return res.status(500).json(createApiResponse(
+    res.status(500).json(createApiResponse(
       false,
       "An error occurred during guide generation",
       undefined,
       undefined,
       error instanceof Error ? error.message : "Unknown error"
     ));
+    return; // Explicitly return after sending response
   }
 };

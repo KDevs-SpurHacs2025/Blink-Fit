@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
+import PrimaryButton from "../components/PrimaryButton";
 
 const choiceQuestions = questions.filter((q) => q.type === "choice");
 const inputQuestions = questions.filter((q) => q.type === "input");
@@ -9,8 +10,11 @@ const inputQuestions = questions.filter((q) => q.type === "input");
 export default function Survey() {
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [modalPayload, setModalPayload] = useState(null);
   const progress = step === 1 ? "50%" : "100%";
   const navigate = useNavigate();
+  const setSurveyAnswers = useUserStore((state) => state.setSurveyAnswers);
 
   const allChoicesAnswered = choiceQuestions.every((q) => answers[q.name]);
   const allInputsFilled = inputQuestions.every((q) => {
@@ -20,7 +24,7 @@ export default function Survey() {
       : val && val.trim() !== "";
   });
 
-  const handleInput = (name, value, type) => {
+  const handleInput = (name, value) => {
     setAnswers((a) => ({ ...a, [name]: value }));
   };
 
@@ -28,24 +32,108 @@ export default function Survey() {
     setStep(2);
   };
 
+  function buildApiPayload() {
+    // 객관식(quiz) 변환
+    const quiz = choiceQuestions.map((q, idx) => {
+      const selected = q.options.find((opt) => opt.text === answers[q.name]);
+      return {
+        questionId: idx + 1,
+        answer: answers[q.name],
+        level: selected ? selected.level : 0,
+      };
+    });
+    // 주관식(subjective) 변환
+    const subjective = {};
+    inputQuestions.forEach((q) => {
+      subjective[q.name] = answers[q.name] || "";
+    });
+    // userId 예시 (실제 userStore에서 가져와도 됨)
+    return {
+      userId: "janeDoe@gmail.com",
+      quiz,
+      subjective,
+    };
+  }
+
   const handleSave = () => {
-    alert("Survey saved!" + JSON.stringify(answers, null, 2));
+    const apiPayload = buildApiPayload();
+    setSurveyAnswers(answers);
+    setModalPayload(apiPayload);
+    setShowModal(true);
+  };
+
+  const handleModalConfirm = () => {
+    setShowModal(false);
     navigate("/routine");
   };
 
+  const handleModalCancel = () => {
+    setShowModal(false);
+  };
+
+  const renderModalContent = () => {
+    if (!modalPayload) return null;
+    // Map questionId to question text for quiz
+    const quizMap = {};
+    choiceQuestions.forEach((q, idx) => {
+      quizMap[idx + 1] = q.question;
+    });
+    // Map subjective name to question text
+    const subjectiveMap = {};
+    inputQuestions.forEach((q) => {
+      subjectiveMap[q.name] = q.question;
+    });
+    return (
+      <div className="text-left">
+        <h3 className="font-semibold mb-2 text-sm">Quiz Answers</h3>
+        <ul className="mb-3 list-disc pl-4 text-xs">
+          {modalPayload.quiz.map((item) => (
+            <li
+              key={item.questionId}
+              className="mb-1 flex gap-1 items-start whitespace-normal break-words"
+            >
+              <span className="font-medium whitespace-normal break-words">
+                {quizMap[item.questionId]}:
+              </span>
+              <span className="whitespace-normal break-words text-gray-700">
+                {item.answer}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <h3 className="font-semibold mb-2 text-sm">Your Info</h3>
+        <ul className="list-disc pl-4 text-xs">
+          {Object.entries(modalPayload.subjective).map(([key, value]) => (
+            <li
+              key={key}
+              className="mb-1 flex gap-1 items-start whitespace-normal break-words"
+            >
+              <span className="font-medium whitespace-normal break-words">
+                {subjectiveMap[key]}:
+              </span>
+              <span className="whitespace-normal break-words text-gray-700">
+                {value}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-100 overflow-hidden">
+    <div className="w-full h-full flex items-center justify-center bg-color overflow-hidden">
       <div className="w-3/4 h-full flex flex-col items-center">
         {/* Progress bar */}
-        <div className="w-3/4 h-2 bg-gray-200 rounded-full my-10">
+        <div className="w-3/4 h-2 bg-[#D9D9D9] rounded-full mt-10 mb-12">
           <motion.div
-            className="h-full bg-green-500 rounded-full"
+            className="h-full bg-primary rounded-full"
             style={{ width: progress }}
             layout
             transition={{ duration: 0.4 }}
           />
         </div>
-        <div className="space-y-8 mb-8 text-black text-medium font-medium flex-1 overflow-y-auto hide-scrollbar w-full">
+        <div className="w-full space-y-8 mb-8 flex-1 overflow-y-auto hide-scrollbar">
           <AnimatePresence mode="wait">
             {step === 1 ? (
               <motion.div
@@ -55,40 +143,38 @@ export default function Survey() {
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-3xl text-black font-semibold text-center mb-10">
+                <h2 className="text-3xl text-black font-semibold text-center mb-6">
                   Eye Health Quiz
                 </h2>
                 {choiceQuestions.map((q) => (
-                  <div key={q.name} className="w-full mb-8">
-                    <p className="text-md mb-2">{q.question}</p>
+                  <div key={q.name} className="w-full mb-10">
+                    <p className="text-medium mb-2">{q.question}</p>
                     <div className="space-y-2">
                       {q.options.map((option, idx) => (
                         <label
                           key={idx}
-                          className="flex items-center gap-2 bg-white border rounded-lg shadow-md p-4 cursor-pointer"
+                          className="flex items-center gap-2 bg-white border rounded-lg shadow-sm p-4 cursor-pointer"
                         >
                           <input
                             type="radio"
                             name={q.name}
                             className="form-radio"
                             checked={answers[q.name] === option}
-                            onChange={() =>
-                              handleInput(q.name, option, "choice")
-                            }
+                            onChange={() => handleInput(q.name, option)}
                           />
-                          <span className="text-sm">{option}</span>
+                          <span className="text-sm">{option.text}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                 ))}
-                <button
-                  className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition mt-8"
+                <PrimaryButton
                   onClick={handleNext}
                   disabled={!allChoicesAnswered}
+                  className="mt-8"
                 >
                   Next
-                </button>
+                </PrimaryButton>
               </motion.div>
             ) : (
               <motion.div
@@ -103,28 +189,28 @@ export default function Survey() {
                 </h2>
                 {inputQuestions.map((q) => (
                   <div key={q.name} className="mb-6">
-                    <label className="block mb-2 font-md">{q.question}</label>
+                    <label className="block mb-2 text-medium font-base">
+                      {q.question}
+                    </label>
                     <input
                       type={q.inputType}
                       name={q.name}
                       className="w-full border rounded-lg p-3"
                       value={answers[q.name] || ""}
-                      onChange={(e) =>
-                        handleInput(q.name, e.target.value, q.inputType)
-                      }
+                      onChange={(e) => handleInput(q.name, e.target.value)}
                       inputMode={
                         q.inputType === "number" ? "numeric" : undefined
                       }
                     />
                   </div>
                 ))}
-                <button
-                  className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition mt-8"
+                <PrimaryButton
                   onClick={handleSave}
                   disabled={!allInputsFilled}
+                  className="mt-8"
                 >
                   Save
-                </button>
+                </PrimaryButton>
               </motion.div>
             )}
           </AnimatePresence>
