@@ -94,7 +94,9 @@ const Home = () => {
               </div>
               <div className="text-xl font-semibold text-black mb-2">
                 {apiData?.recentScreenTimes
-                  ? `${apiData.recentScreenTimes.reduce((a, b) => a + b, 0)}h`
+                  ? `${apiData.recentScreenTimes
+                      .reduce((a, b) => a + b, 0)
+                      .toFixed(1)}h`
                   : "20h"}
               </div>
             </div>
