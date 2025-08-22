@@ -1,6 +1,6 @@
 # 👁️ Blink-FIT
 
-![BlinkFitIcon-Unbg-green](https://github.com/user-attachments/assets/ae4f46a6-ee4c-45b6-86f8-8a0842898dad)![BlinkFitIcon-Unbg-black](https://github.com/user-attachments/assets/818b7b3f-1915-4209-907c-b7cbb30ad2ee)
+![BlinkFitIcon-Unbg-green](https://github.com/user-attachments/assets/ae4f46a6-ee4c-45b6-86f8-8a0842898dad)![BlinkFitIcon-Unbg-green](https://github.com/user-attachments/assets/ae4f46a6-ee4c-45b6-86f8-8a0842898dad)
 
 
 
