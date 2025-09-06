@@ -23,7 +23,7 @@ We wanted to address the growing issue of **Computer Vision Syndrome** and **Dry
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, TypeScript, TailwindCSS
+- **Frontend**: React, JavaScript, TailwindCSS
 - **AI**: Google Gemini API (LLM)
 - **Backend/DB**: Firebase, MongoDB Atlas
 - **Tools**: GitHub Copilot, Vite, Zustand, FaceLandmarker API
